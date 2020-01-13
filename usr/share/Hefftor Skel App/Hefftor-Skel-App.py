@@ -17,7 +17,7 @@ MENU_CATS = ["polybar", "herbstluftwm",
 class HSApp(Gtk.Window):
     def __init__(self):
         super(HSApp, self).__init__()
-        Gtk.Window.__init__(self, title="Hefftors Skel App")
+        Gtk.Window.__init__(self, title="Hefftor SkelAp")
         self.set_resizable(False)
         self.set_border_width(10)
         self.set_icon_from_file(os.path.join(base_dir, 'hefftorlinux.svg'))
@@ -98,14 +98,31 @@ class HSApp(Gtk.Window):
         self.listRow2.add(self.hbox2)
 
         # ListRow 1 Elements
-        self.label2 = Gtk.Label(xalign=0)
-        self.label2.set_text("Created By Brad Heffernan")
         self.btn2 = Gtk.Button(label="Run")
         self.btn2.connect("clicked", self.on_button_fetch_clicked)
 
-        self.hbox2.pack_start(self.label2, True, True, 0)
         self.hbox2.pack_end(self.btn2, False, False, 0)
         self.listview2.add(self.listRow2)
+
+        # ===========================================
+        #				Second Section
+        # ===========================================
+        self.listview3 = Gtk.ListBox()
+        self.listview3.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.vbox.pack_start(self.listview3, True, True, 0)
+
+        # ListRow 1
+        self.listRow3 = Gtk.ListBoxRow()
+        self.hbox3 = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.listRow3.add(self.hbox3)
+
+        # ListRow 1 Elements
+        self.label3 = Gtk.Label(xalign=0)
+        self.label3.set_text("Created By Brad Heffernan")
+
+        self.hbox3.pack_start(self.label3, True, True, 0)
+        self.listview3.add(self.listRow3)
 
     def resizeImage(self, x, y):
         pixbuf = self.pixbuf.scale_simple(x, y,
