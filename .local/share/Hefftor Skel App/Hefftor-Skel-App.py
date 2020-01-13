@@ -19,7 +19,7 @@ class HSApp(Gtk.Window):
         Gtk.Window.__init__(self, title="Hefftors Skel App")
         self.set_resizable(False)
         self.set_border_width(10)
-        self.set_icon_from_file(os.path.join(base_dir, 'icon.svg'))
+        self.set_icon_from_file(os.path.join(base_dir, 'hefftorlinux.svg'))
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect("delete-event", Gtk.main_quit)
         self.connect("check_resize", self.on_check_resize)
@@ -78,13 +78,33 @@ class HSApp(Gtk.Window):
             self.cat.append_text(CATS)
         self.cat.set_active(0)
         self.cat.set_size_request(170, 0)
-        self.btn = Gtk.Button(label="Fetch")
-        self.btn.connect("clicked", self.on_button_fetch_clicked)
 
         self.hbox1.pack_start(self.label1, True, True, 0)
-        self.hbox1.pack_end(self.btn, False, False, 0)
-        self.hbox1.pack_end(self.cat, False, False, 0)
+        self.hbox1.pack_end(self.cat, False, True, 0)
         self.listview1.add(self.listRow1)
+
+        # ===========================================
+        #				Second Section
+        # ===========================================
+        self.listview2 = Gtk.ListBox()
+        self.listview2.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.vbox.pack_start(self.listview2, True, True, 0)
+
+        # ListRow 1
+        self.listRow2 = Gtk.ListBoxRow()
+        self.hbox2 = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.listRow2.add(self.hbox2)
+
+        # ListRow 1 Elements
+        self.label2 = Gtk.Label(xalign=0)
+        self.label2.set_text("Created By Brad Heffernan")
+        self.btn2 = Gtk.Button(label="Run")
+        self.btn2.connect("clicked", self.on_button_fetch_clicked)
+
+        self.hbox2.pack_start(self.label2, True, True, 0)
+        self.hbox2.pack_end(self.btn2, False, False, 0)
+        self.listview2.add(self.listRow2)
 
     def resizeImage(self, x, y):
         pixbuf = self.pixbuf.scale_simple(x, y,
