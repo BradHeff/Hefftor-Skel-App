@@ -6,7 +6,7 @@ import subprocess
 from os.path import expanduser
 import shutil
 import signal
-from gi.repository import Gtk, GdkPixbuf
+from gi.repository import Gtk, GdkPixbuf, GLib
 import gi
 import os
 gi.require_version('Gtk', '3.0')
@@ -105,8 +105,11 @@ class HSApp(Gtk.Window):
         # ListRow 1 Elements
         self.btn2 = Gtk.Button(label="Run")
         self.btn2.connect("clicked", self.on_button_fetch_clicked)
+        self.label4 = Gtk.Label(xalign=0)
+        self.label4.set_text("Idle...")
 
         self.hbox2.pack_end(self.btn2, False, False, 0)
+        self.hbox2.pack_start(self.label4, False, True, 0)
         self.listview2.add(self.listRow2)
 
         # ===========================================
@@ -141,26 +144,34 @@ class HSApp(Gtk.Window):
                          boxAllocation.height)
 
     def on_button_fetch_clicked(self, widget):
-        now = datetime.datetime.now()
         self.btn2.set_sensitive(False)
-        thread = threading.Thread(target=self.processing, args=(now,))
-        thread.start()
-        thread.join()
+        if self.firstrun == 0:
+            GLib.idle_add(self.setMessage, "Running Backup")
 
-        self.run()
+        t1 = threading.Thread(target=self.processing, args=())
+        t1.daemon = True
+        t1.start()
 
-    def processing(self, now):
+    def setMessage(self, message):
+        self.label4.set_text(message)
+
+    def processing(self):
+        now = datetime.datetime.now()
         if self.firstrun == 0:
             copytree(home + '/.config', home + '/.config_backup-' +
                      now.strftime("%Y-%m-%d %H:%M:%S"))
             copytree(home + '/.local', home + '/.local_backup-' +
                      now.strftime("%Y-%m-%d %H:%M:%S"))
             self.firstrun = 1
+            GLib.idle_add(self.setMessage, "Done")
+
+        GLib.idle_add(self.setMessage, "Running Skel")
+        GLib.idle_add(self.run)
 
     def run(self):
         if self.cat.get_active_text() == "polybar":
-            copytree('/etc/skel/.config/polybar/',
-                     home + '/.config/polybar/')
+            GLib.idle_add(copytree, ('/etc/skel/.config/polybar/',
+                                     home + '/.config/polybar/'))
             print("Path copied")
             ecode = 0
         elif self.cat.get_active_text() == "herbstluftwm":
@@ -207,6 +218,7 @@ class HSApp(Gtk.Window):
             self.callBox(0)
 
         self.btn2.set_sensitive(True)
+        GLib.idle_add(self.setMessage, "Idle...")
 
     def callBox(self, errorCode):
         if errorCode == 0:
