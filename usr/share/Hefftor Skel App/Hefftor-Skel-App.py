@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import threading
+import datetime
+import subprocess
 from os.path import expanduser
 import shutil
 import signal
@@ -7,6 +10,7 @@ from gi.repository import Gtk, GdkPixbuf
 import gi
 import os
 gi.require_version('Gtk', '3.0')
+
 
 home = expanduser("~")
 base_dir = os.path.dirname(os.path.realpath(__file__))
@@ -24,6 +28,7 @@ class HSApp(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect("delete-event", Gtk.main_quit)
         self.connect("check_resize", self.on_check_resize)
+        self.firstrun = 0
 
         hb = Gtk.HeaderBar()
         hb.props.show_close_button = True
@@ -136,7 +141,23 @@ class HSApp(Gtk.Window):
                          boxAllocation.height)
 
     def on_button_fetch_clicked(self, widget):
+        now = datetime.datetime.now()
         self.btn2.set_sensitive(False)
+        thread = threading.Thread(target=self.processing, args=(now,))
+        thread.start()
+        thread.join()
+
+        self.run()
+
+    def processing(self, now):
+        if self.firstrun == 0:
+            copytree(home + '/.config', home + '/.config_backup-' +
+                     now.strftime("%Y-%m-%d %H:%M:%S"))
+            copytree(home + '/.local', home + '/.local_backup-' +
+                     now.strftime("%Y-%m-%d %H:%M:%S"))
+            self.firstrun = 1
+
+    def run(self):
         if self.cat.get_active_text() == "polybar":
             copytree('/etc/skel/.config/polybar/',
                      home + '/.config/polybar/')
