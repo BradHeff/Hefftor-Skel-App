@@ -11,7 +11,7 @@ gi.require_version('Gtk', '3.0')
 home = expanduser("~")
 base_dir = os.path.dirname(os.path.realpath(__file__))
 MENU_CATS = ["polybar", "herbstluftwm",
-             "bspwm", "bashrc-latest", "root configs"]
+             "bspwm", "bashrc-latest", "root configs", "locals"]
 
 
 class HSApp(Gtk.Window):
@@ -119,6 +119,7 @@ class HSApp(Gtk.Window):
                          boxAllocation.height)
 
     def on_button_fetch_clicked(self, widget):
+        self.btn2.set_sensitive(False)
         if self.cat.get_active_text() == "polybar":
             copytree('/etc/skel/.config/polybar/',
                      home + '/.config/polybar/')
@@ -157,10 +158,16 @@ class HSApp(Gtk.Window):
                 '/etc/skel/.xsessionrc', home + "/.xsessionrc")
             print("Root Configs copied")
             ecode = 0
+        elif self.cat.get_active_text() == "locals":
+            copytree('/etc/skel/.local/', home + '/.local/')
+            print("Path copied")
+            ecode = 0
         if(ecode == 1):
             self.callBox(1)
         else:
             self.callBox(0)
+
+        self.btn2.set_sensitive(True)
 
     def callBox(self, errorCode):
         if errorCode == 0:
