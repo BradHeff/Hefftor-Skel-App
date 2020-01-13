@@ -14,7 +14,7 @@ gi.require_version('Gtk', '3.0')
 home = expanduser("~")
 base_dir = os.path.dirname(os.path.realpath(__file__))
 MENU_CATS = ["polybar", "herbstluftwm",
-             "bspwm", "bashrc-latest", "root configs", "locals"]
+             "bspwm", "bashrc-latest", "root configs", "locals", "xfce"]
 
 
 class HSApp(Gtk.Window):
@@ -112,6 +112,8 @@ class HSApp(Gtk.Window):
         self.hbox2.pack_start(self.label4, False, True, 0)
         self.listview2.add(self.listRow2)
 
+        self.progressbar = Gtk.ProgressBar()
+        self.vbox.pack_start(self.progressbar, True, True, 0)
         # ===========================================
         #				Second Section
         # ===========================================
@@ -132,6 +134,9 @@ class HSApp(Gtk.Window):
         self.hbox3.pack_start(self.label3, True, True, 0)
         self.listview3.add(self.listRow3)
 
+    def setProgress(self, value):
+        self.progressbar.set_fraction(value)
+
     def resizeImage(self, x, y):
         pixbuf = self.pixbuf.scale_simple(x, y,
                                           GdkPixbuf.InterpType.BILINEAR)
@@ -144,6 +149,7 @@ class HSApp(Gtk.Window):
                          boxAllocation.height)
 
     def on_button_fetch_clicked(self, widget):
+
         self.btn2.set_sensitive(False)
         if self.firstrun == 0:
             self.setMessage("Running Backup")
@@ -158,10 +164,13 @@ class HSApp(Gtk.Window):
     def processing(self):
         now = datetime.datetime.now()
         if self.firstrun == 0:
+            GLib.idle_add(self.setProgress, 0.1)
             self.copytree(home + '/.config', home + '/.config_backup-' +
                           now.strftime("%Y-%m-%d %H:%M:%S"))
+            GLib.idle_add(self.setProgress, 0.3)
             self.copytree(home + '/.local', home + '/.local_backup-' +
                           now.strftime("%Y-%m-%d %H:%M:%S"))
+            GLib.idle_add(self.setProgress, 0.5)
             shutil.copy(
                 home + '/.bashrc', home + "/.bashrc-backup-" +
                 now.strftime("%Y-%m-%d %H:%M:%S"))
@@ -172,6 +181,7 @@ class HSApp(Gtk.Window):
         GLib.idle_add(self.run)
 
     def run(self):
+        self.setProgress(0.7)
         if self.cat.get_active_text() == "polybar":
             self.ecode = 0
             print(self.ecode)
@@ -255,6 +265,8 @@ class HSApp(Gtk.Window):
                 shutil.copy(
                     src5, home + "/.xinitrc")
 
+            self.setProgress(0.8)
+
             if not os.path.isfile(src6):
                 self.ecode = 1
             else:
@@ -290,11 +302,56 @@ class HSApp(Gtk.Window):
                 self.copytree(src2, home + '/.local/bin')
             print("Path copied")
 
+        elif self.cat.get_active_text() == "xfce":
+            self.ecode = 0
+            src1 = '/etc/skel/.config/xfce4/panel'
+            src2 = '/etc/skel/.config/xfce4/terminal'
+            src3 = '/etc/skel/.config/xfce4/xfconf'
+
+            src4 = '/etc/skel/.config/xfce4/helpers.rc'
+            src5 = '/etc/skel/.config/xfce4/xfce4-screenshooter'
+            src6 = '/etc/skel/.config/xfce4/xfce4-taskmanager.rc'
+
+            if not os.path.exists(src1):
+                self.ecode = 1
+            else:
+                self.copytree(src1, home + '/.config/xfce4/panel')
+
+            if not os.path.exists(src2):
+                self.ecode = 1
+            else:
+                self.copytree(src2, home + '/.config/xfce4/terminal')
+
+            if not os.path.exists(src3):
+                self.ecode = 1
+            else:
+                self.copytree(src3, home + '/.config/xfce4/xfconf')
+            self.setProgress(0.8)
+            if not os.path.isfile(src4):
+                self.ecode = 1
+            else:
+                shutil.copy(
+                    src4, home + "/.config/xfce4/helpers.rc")
+
+            if not os.path.isfile(src5):
+                self.ecode = 1
+            else:
+                shutil.copy(
+                    src5, home + "/.config/xfce4/xfce4-screenshooter")
+
+            if not os.path.isfile(src6):
+                self.ecode = 1
+            else:
+                shutil.copy(
+                    src6, home + "/.config/xfce4/xfce4-taskmanager.rc")
+            print("xfce copied")
+
+        self.setProgress(1)
         if(self.ecode == 1):
             self.callBox(1)
         else:
             self.callBox(0)
-
+        self.setProgress(0)
         self.btn2.set_sensitive(True)
         self.setMessage("Idle...")
 
