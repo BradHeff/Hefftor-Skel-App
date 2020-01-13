@@ -176,7 +176,8 @@ class HSApp(Gtk.Window):
             print("Root Configs copied")
             ecode = 0
         elif self.cat.get_active_text() == "locals":
-            copytree('/etc/skel/.local/', home + '/.local/')
+            copytree('/etc/skel/.local/share', home + '/.local/share')
+            copytree('/etc/skel/.local/bin', home + '/.local/bin')
             print("Path copied")
             ecode = 0
         if(ecode == 1):
