@@ -136,9 +136,9 @@ class HSApp(Gtk.Window):
         elif self.cat.get_active_text() == "bashrc-latest":
             shutil.copy(
                 '/etc/skel/.bashrc-latest', home + "/.bashrc-latest")
-            print("Path of copied file : ", newPath)
+            print("Path of copied file")
             ecode = 0
-        elif self/cat.get_active_text() == "root configs":
+        elif self.cat.get_active_text() == "root configs":
             shutil.copy(
                 '/etc/skel/.bashrc-latest', home + "/.bashrc-latest")
             shutil.copy(
