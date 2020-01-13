@@ -119,40 +119,65 @@ class HSApp(Gtk.Window):
 
     def on_button_fetch_clicked(self, widget):
         if self.cat.get_active_text() == "polybar":
-            copytree('/etc/skel/.config/polybar/', home + '/.config/polybar/')
+            self.copytree('/etc/skel/.config/polybar/',
+                          home + '/.config/polybar/')
             print("Path copied")
+            ecode = 0
         elif self.cat.get_active_text() == "herbstluftwm":
-            copytree('/etc/skel/.config/herbstluftwm/',
-                     home + '/.config/herbstluftwm/')
+            self.copytree('/etc/skel/.config/herbstluftwm/',
+                          home + '/.config/herbstluftwm/')
             print("Path copied")
+            ecode = 0
         elif self.cat.get_active_text() == "bspwm":
-            copytree('/etc/skel/.config/bspwm/', home + '/.config/bspwm/')
+            self.copytree('/etc/skel/.config/bspwm/', home + '/.config/bspwm/')
             print("Path copied")
+            ecode = 0
         elif self.cat.get_active_text() == "bashrc-latest":
             newPath = shutil.copy(
                 '/etc/skel/.bashrc-latest', home + "/.bashrc-latest")
             print("Path of copied file : ", newPath)
+            ecode = 0
+
+        if(ecode == 1):
+            self.callBox(1)
+        else:
+            self.callBox(0)
+
+    def callBox(self, errorCode):
+        if errorCode == 0:
+            message = "Skel executed successfully."
+            title = "Success!!"
+        else:
+            title = "Error!!"
+            message = "Seems the terminal selected is incorrect or the command input is not properly coded for your terminals excecution option."
+
+        md = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.INFO,
+                               buttons=Gtk.ButtonsType.OK, text=title)
+        md.format_secondary_text(message)
+        md.run()
+        md.destroy()
+        # self.set_sensitive(True)
+
+    def copytree(self, src, dst, symlinks=False, ignore=None):
+        for item in os.listdir(src):
+            s = os.path.join(src, item)
+            d = os.path.join(dst, item)
+            if os.path.exists(d):
+                try:
+                    shutil.rmtree(d)
+                except Exception as e:
+                    print(e)
+                    ecode = 1
+                    os.unlink(d)
+            if os.path.isdir(s):
+                shutil.copytree(s, d, symlinks, ignore)
+            else:
+                shutil.copy2(s, d)
 
 
 def signal_handler(sig, frame):
     print('\nYou pressed Ctrl+C!\nFreechoice Menu GUI is Closing.')
     Gtk.main_quit(0)
-
-
-def copytree(src, dst, symlinks=False, ignore=None):
-    for item in os.listdir(src):
-        s = os.path.join(src, item)
-        d = os.path.join(dst, item)
-        if os.path.exists(d):
-            try:
-                shutil.rmtree(d)
-            except Exception as e:
-                print(e)
-                os.unlink(d)
-        if os.path.isdir(s):
-            shutil.copytree(s, d, symlinks, ignore)
-        else:
-            shutil.copy2(s, d)
 
 
 if __name__ == '__main__':
