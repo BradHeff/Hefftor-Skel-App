@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Hefftor Skel App
+GenericName=Skel Config Copy
+X-GNOME-FullName=Hefftor Skel App
+Comment=Copy /etc/skel into your configs
+Exec=~/.local/bin/hefftor-skel-app
+Icon=~/.local/share/Hefftor\ Skel\ App/icon.svg
+Terminal=false
+Type=Application
+Categories=GTK;Settings;Security;X-GNOME-Settings-Panel;X-GNOME-SystemSettings;X-Unity-Settings-Panel;X-XFCE-SettingsDialog;X-XFCE-SystemSettings;
+Keywords=Hefftor;
+StartupNotify=true
