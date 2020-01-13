@@ -119,17 +119,17 @@ class HSApp(Gtk.Window):
 
     def on_button_fetch_clicked(self, widget):
         if self.cat.get_active_text() == "polybar":
-            self.copytree('/etc/skel/.config/polybar/',
-                          home + '/.config/polybar/')
+            copytree('/etc/skel/.config/polybar/',
+                     home + '/.config/polybar/')
             print("Path copied")
             ecode = 0
         elif self.cat.get_active_text() == "herbstluftwm":
-            self.copytree('/etc/skel/.config/herbstluftwm/',
-                          home + '/.config/herbstluftwm/')
+            copytree('/etc/skel/.config/herbstluftwm/',
+                     home + '/.config/herbstluftwm/')
             print("Path copied")
             ecode = 0
         elif self.cat.get_active_text() == "bspwm":
-            self.copytree('/etc/skel/.config/bspwm/', home + '/.config/bspwm/')
+            copytree('/etc/skel/.config/bspwm/', home + '/.config/bspwm/')
             print("Path copied")
             ecode = 0
         elif self.cat.get_active_text() == "bashrc-latest":
@@ -158,23 +158,24 @@ class HSApp(Gtk.Window):
         md.destroy()
         # self.set_sensitive(True)
 
-    def copytree(self, src, dst, symlinks=False, ignore=None):
-        if os.path.exists(dst):
-            os.makedirs(dst)
-        for item in os.listdir(src):
-            s = os.path.join(src, item)
-            d = os.path.join(dst, item)
-            if os.path.exists(d):
-                try:
-                    shutil.rmtree(d)
-                except Exception as e:
-                    print(e)
-                    ecode = 1
-                    os.unlink(d)
-            if os.path.isdir(s):
-                shutil.copytree(s, d, symlinks, ignore)
-            else:
-                shutil.copy2(s, d)
+
+def copytree(src, dst, symlinks=False, ignore=None):
+    if os.path.exists(dst):
+        os.makedirs(dst)
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.exists(d):
+            try:
+                shutil.rmtree(d)
+            except Exception as e:
+                print(e)
+                ecode = 1
+                os.unlink(d)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, symlinks, ignore)
+        else:
+            shutil.copy2(s, d)
 
 
 def signal_handler(sig, frame):
