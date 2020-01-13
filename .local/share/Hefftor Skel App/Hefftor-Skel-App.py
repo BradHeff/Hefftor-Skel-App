@@ -159,6 +159,8 @@ class HSApp(Gtk.Window):
         # self.set_sensitive(True)
 
     def copytree(self, src, dst, symlinks=False, ignore=None):
+        if os.path.exists(dst):
+            os.makedirs(dst)
         for item in os.listdir(src):
             s = os.path.join(src, item)
             d = os.path.join(dst, item)
