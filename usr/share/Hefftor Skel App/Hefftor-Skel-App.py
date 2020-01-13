@@ -10,7 +10,8 @@ gi.require_version('Gtk', '3.0')
 
 home = expanduser("~")
 base_dir = os.path.dirname(os.path.realpath(__file__))
-MENU_CATS = ["polybar", "herbstluftwm", "bspwm", "bashrc-latest"]
+MENU_CATS = ["polybar", "herbstluftwm",
+             "bspwm", "bashrc-latest", "root configs"]
 
 
 class HSApp(Gtk.Window):
@@ -133,11 +134,29 @@ class HSApp(Gtk.Window):
             print("Path copied")
             ecode = 0
         elif self.cat.get_active_text() == "bashrc-latest":
-            newPath = shutil.copy(
+            shutil.copy(
                 '/etc/skel/.bashrc-latest', home + "/.bashrc-latest")
             print("Path of copied file : ", newPath)
             ecode = 0
-
+        elif self/cat.get_active_text() == "root configs":
+            shutil.copy(
+                '/etc/skel/.bashrc-latest', home + "/.bashrc-latest")
+            shutil.copy(
+                '/etc/skel/.dmrc', home + "/.dmrc")
+            shutil.copy(
+                '/etc/skel/.face', home + "/.face")
+            shutil.copy(
+                '/etc/skel/.inputrc-latest', home + "/.inputrc-latest")
+            shutil.copy(
+                '/etc/skel/.xinitrc', home + "/.xinitrc")
+            shutil.copy(
+                '/etc/skel/.Xresources', home + "/.Xresources")
+            shutil.copy(
+                '/etc/skel/.xsession', home + "/.xsession")
+            shutil.copy(
+                '/etc/skel/.xsessionrc', home + "/.xsessionrc")
+            print("Root Configs copied")
+            ecode = 0
         if(ecode == 1):
             self.callBox(1)
         else:
