@@ -15,15 +15,14 @@ gi.require_version('Gtk', '3.0')
 # home = expanduser("~")
 base_dir = os.path.dirname(os.path.realpath(__file__))
 MENU_CATS = [
-    "polybar", 
-    "herbstluftwm",
-    "bspwm", 
-    "bashrc-latest", 
-    "root configs", 
-    "locals", 
-    "xfce", 
-    "xfce-config", 
-    "hlwm/bspwm configs"
+    "polybar Configs", 
+    "herbstluftwm Configs",
+    "bspwm Configs", 
+    "root Configs", 
+    "Local Configs", 
+    "xfce Configs", 
+    "xfce-config package", 
+    "hlwm/bspwm configs package"
     ]
 
 
@@ -294,7 +293,7 @@ class HSApp(Gtk.Window):
 
     def run(self, cat):
 
-        if cat == "polybar":
+        if cat == "polybar Configs":
             self.ecode = 0
             print(self.ecode)
             src = '/etc/skel/.config/polybar/'
@@ -306,7 +305,7 @@ class HSApp(Gtk.Window):
                 print("Path copied")
 
             print(self.ecode)
-        elif cat == "herbstluftwm":
+        elif cat == "herbstluftwm Configs":
             self.ecode = 0
             src = '/etc/skel/.config/herbstluftwm/'
             if not os.path.exists(src):
@@ -317,7 +316,7 @@ class HSApp(Gtk.Window):
                                    )
                 print("Path copied")
 
-        elif cat == "bspwm":
+        elif cat == "bspwm Configs":
             self.ecode = 0
             src = '/etc/skel/.config/bspwm/'
             if not os.path.exists(src):
@@ -327,19 +326,7 @@ class HSApp(Gtk.Window):
                                    )
                 print("Path copied")
 
-        elif cat == "bashrc-latest":
-            self.ecode = 0
-
-            src = '/etc/skel/.bashrc-latest'
-
-            if not os.path.isfile(src):
-                self.ecode = 1
-            else:
-                shutil.copy(
-                    src, home + "/.bashrc-latest")
-                print("Path of copied file")
-
-        elif cat == "root configs":
+        elif cat == "root Configs":
             self.ecode = 0
             src1 = '/etc/skel/'
 
@@ -354,7 +341,7 @@ class HSApp(Gtk.Window):
 
             print("Root Configs copied")
 
-        elif cat == "locals":
+        elif cat == "Local Configs":
             self.ecode = 0
             src1 = '/etc/skel/.local'
             if not os.path.exists(src1):
@@ -365,7 +352,7 @@ class HSApp(Gtk.Window):
 
             print(".local copied")
 
-        elif cat == "xfce":
+        elif cat == "xfce Configs":
             self.ecode = 0
             src1 = '/etc/skel/.config/xfce4'
             # src2 = '/etc/skel/.config/xfce4/terminal'
@@ -403,7 +390,7 @@ class HSApp(Gtk.Window):
 
             print("xfce copied")
 
-        elif cat == "xfce-config":
+        elif cat == "xfce-config package":
             self.ecode = 0
             list = ["fontconfig","galculator","gtk-3.0","htop","nano","nomacs","qt5ct","volumeicon","mimeapps.list","Trolltech.conf","yad.conf"]
             for item in list:                
@@ -415,7 +402,7 @@ class HSApp(Gtk.Window):
                     shutil.copy("/etc/skel/.config/" + item, home + "/.config/" + item)
 
             print("xfce copied")
-        elif cat == "hlwm/bspwm configs":
+        elif cat == "hlwm/bspwm configs package":
             self.ecode = 0
             src1 = '/etc/skel/.config/herbstluftwm/'
             src2 = '/etc/skel/.config/bspwm/'
