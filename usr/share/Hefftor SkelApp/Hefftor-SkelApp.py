@@ -117,16 +117,16 @@ class HSApp(Gtk.Window):
         self.listRow5.add(self.hbox5)
 
         # ListRow 1 Elements
-        self.btn4 = Gtk.Button(label="Clean Config")
-        self.btn5 = Gtk.Button(label="Clean Local")
-        self.btn6 = Gtk.Button(label="Clean Bashrc")
+        self.btn4 = Gtk.Button(label="Clean .config")
+        self.btn5 = Gtk.Button(label="Clean .local")
+        self.btn6 = Gtk.Button(label="Clean .bashrc")
 
         self.btn4.connect("clicked", self.on_config_clicked)
         self.btn5.connect("clicked", self.on_local_clicked)
         self.btn6.connect("clicked", self.on_bash_clicked)
 
         self.label4 = Gtk.Label(xalign=0)
-        self.label4.set_text("Backup Configs")
+        self.label4.set_text("Delete Backup Configs")
         self.hbox5.pack_start(self.label4, True, False, 0)
         self.hbox4.pack_start(self.btn4, False, False, 0)
         self.hbox4.pack_start(self.btn5, False, False, 0)
@@ -197,7 +197,7 @@ class HSApp(Gtk.Window):
         self.label3 = Gtk.Label(xalign=0)
         self.label3.set_text("Created By Brad Heffernan")
 
-        self.hbox3.pack_start(self.label3, True, True, 0)
+        self.hbox3.pack_start(self.label3, True, False, 0)
         self.listview3.add(self.listRow3)
 
     def on_config_clicked(self, widget):
@@ -226,7 +226,7 @@ class HSApp(Gtk.Window):
             shutil.copy(
                 home + '/.bashrc', home + "/.bashrc-backup-" +
                 now.strftime("%Y-%m-%d %H:%M:%S"))
-            self.firstrun = 1
+            
             GLib.idle_add(self.setMessage, "Done")
         shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
         self.callBox("bashrc upgraded", "Success!!")
