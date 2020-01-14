@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-from distutils.dir_util import copy_tree
-from distutils.file_util import copy_file
+import Functions
+from Functions import *
 import threading
 import datetime
-import subprocess
-from os.path import expanduser
-import shutil
+# from os.path import expanduser
+# import shutil
 import signal
 from gi.repository import Gtk, GdkPixbuf, GLib
 import gi
-import os
+# import os
 gi.require_version('Gtk', '3.0')
 
-home = expanduser("~")
+
+# home = expanduser("~")
 base_dir = os.path.dirname(os.path.realpath(__file__))
 MENU_CATS = ["polybar", "herbstluftwm",
              "bspwm", "bashrc-latest", "root configs", "locals", "xfce"]
@@ -29,7 +29,6 @@ class HSApp(Gtk.Window):
         self.connect("delete-event", Gtk.main_quit)
         self.connect("check_resize", self.on_check_resize)
         self.firstrun = 0
-        self.ecode = 0
 
         hb = Gtk.HeaderBar()
         hb.props.show_close_button = True
@@ -79,19 +78,55 @@ class HSApp(Gtk.Window):
 
         # ListRow 1 Elements
         self.label1 = Gtk.Label(xalign=0)
-        self.label1.set_text("Category")
+        self.label1.set_text("Category     ")
         self.cat = Gtk.ComboBoxText()
         for CATS in MENU_CATS:
             self.cat.append_text(CATS)
         self.cat.set_active(0)
         self.cat.set_size_request(170, 0)
 
-        self.hbox1.pack_start(self.label1, True, True, 0)
-        self.hbox1.pack_end(self.cat, False, True, 0)
+        self.hbox1.pack_start(self.label1, False, False, 0)
+        self.hbox1.pack_end(self.cat, True, True, 0)
         self.listview1.add(self.listRow1)
 
         # ===========================================
         #				Second Section
+        # ===========================================
+        self.listview4 = Gtk.ListBox()
+        self.listview4.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.vbox.pack_start(self.listview4, True, True, 0)
+
+        # ListRow 1
+        self.listRow4 = Gtk.ListBoxRow()
+        self.listRow5 = Gtk.ListBoxRow()
+        self.hbox4 = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.hbox5 = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.listRow4.add(self.hbox4)
+        self.listRow5.add(self.hbox5)
+
+        # ListRow 1 Elements
+        self.btn4 = Gtk.Button(label="Clean Config")
+        self.btn5 = Gtk.Button(label="Clean Local")
+        self.btn6 = Gtk.Button(label="Clean Bashrc")
+
+        self.btn4.connect("clicked", self.on_config_clicked)
+        self.btn5.connect("clicked", self.on_local_clicked)
+        self.btn6.connect("clicked", self.on_bash_clicked)
+
+        self.label4 = Gtk.Label(xalign=0)
+        self.label4.set_text("Backup Configs")
+        self.hbox5.pack_start(self.label4, True, False, 0)
+        self.hbox4.pack_start(self.btn4, False, False, 0)
+        self.hbox4.pack_start(self.btn5, False, False, 0)
+        self.hbox4.pack_start(self.btn6, False, False, 0)
+
+        self.listview4.add(self.listRow5)
+        self.listview4.add(self.listRow4)
+
+        # ===========================================
+        #				Third Section
         # ===========================================
         self.listview2 = Gtk.ListBox()
         self.listview2.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -104,14 +139,34 @@ class HSApp(Gtk.Window):
         self.listRow2.add(self.hbox2)
 
         # ListRow 1 Elements
-        self.btn2 = Gtk.Button(label="Run")
+        self.btn7 = Gtk.Button(label="Run Bashrc Upgrade")
+        self.btn7.connect("clicked", self.on_bashrc_skel_clicked)
+
+        self.hbox2.pack_end(self.btn7, False, False, 0)
+        self.listview2.add(self.listRow2)
+
+        # ===========================================
+        #				Fourth Section
+        # ===========================================
+        self.listview6 = Gtk.ListBox()
+        self.listview6.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.vbox.pack_start(self.listview6, True, True, 0)
+
+        # ListRow 1
+        self.listRow6 = Gtk.ListBoxRow()
+        self.hbox6 = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.listRow6.add(self.hbox6)
+
+        # ListRow 1 Elements
+        self.btn2 = Gtk.Button(label="Run Skel")
         self.btn2.connect("clicked", self.on_button_fetch_clicked)
         self.label4 = Gtk.Label(xalign=0)
         self.label4.set_text("Idle...")
 
-        self.hbox2.pack_end(self.btn2, False, False, 0)
-        self.hbox2.pack_start(self.label4, False, True, 0)
-        self.listview2.add(self.listRow2)
+        self.hbox6.pack_end(self.btn2, False, False, 0)
+        self.hbox6.pack_start(self.label4, False, True, 0)
+        self.listview6.add(self.listRow6)
 
         self.progressbar = Gtk.ProgressBar()
         self.vbox.pack_start(self.progressbar, True, True, 0)
@@ -135,6 +190,38 @@ class HSApp(Gtk.Window):
         self.hbox3.pack_start(self.label3, True, True, 0)
         self.listview3.add(self.listRow3)
 
+    def on_config_clicked(self, widget):
+        for filename in os.listdir(home):
+            if filename.startswith(".config_backup"):
+                shutil.rmtree(home + "/" + filename)
+        self.callBox("Config backups cleaned.", "Success!!")
+
+    def on_local_clicked(self, widget):
+        for filename in os.listdir(home):
+            if filename.startswith(".local_backup"):
+                shutil.rmtree(home + "/" + filename)
+        self.callBox("local backups cleaned.", "Success!!")
+
+    def on_bash_clicked(self, widget):
+
+        for filename in os.listdir(home):
+            if filename.startswith(".bashrc-backup"):
+                os.unlink(home + "/" + filename)
+        self.callBox("bashrc backups cleaned.", "Success!!")
+
+    def on_bashrc_skel_clicked(self, widget):
+        if self.firstrun == 0:
+            now = datetime.datetime.now()
+            self.setMessage("Running Backup")
+            shutil.copy(
+                home + '/.bashrc', home + "/.bashrc-backup-" +
+                now.strftime("%Y-%m-%d %H:%M:%S"))
+            self.firstrun = 1
+            GLib.idle_add(self.setMessage, "Done")
+        shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
+        self.callBox("bashrc upgraded", "Success!!")
+        self.setMessage("Idle...")
+
     def setProgress(self, value):
         self.progressbar.set_fraction(value)
 
@@ -155,184 +242,48 @@ class HSApp(Gtk.Window):
         if self.firstrun == 0:
             self.setMessage("Running Backup")
 
-        t1 = threading.Thread(target=self.processing, args=())
+        t1 = threading.Thread(target=self.processing,
+                              args=(self.cat.get_active_text(),))
         t1.daemon = True
         t1.start()
 
     def setMessage(self, message):
         self.label4.set_text(message)
 
-    def processing(self):
+    def processing(self, active_text):
         now = datetime.datetime.now()
         if self.firstrun == 0:
             GLib.idle_add(self.setProgress, 0.1)
-            self.copytree(home + '/.config', home + '/.config_backup-' +
-                          now.strftime("%Y-%m-%d %H:%M:%S"))
+            Functions.copytree(self, home + '/.config', home + '/.config_backup-' +
+                               now.strftime("%Y-%m-%d %H:%M:%S"))
             GLib.idle_add(self.setProgress, 0.3)
-            self.copytree(home + '/.local', home + '/.local_backup-' +
-                          now.strftime("%Y-%m-%d %H:%M:%S"))
+            Functions.copytree(self, home + '/.local', home + '/.local_backup-' +
+                               now.strftime("%Y-%m-%d %H:%M:%S"))
             GLib.idle_add(self.setProgress, 0.5)
-            copy_file(
+            shutil.copy(
                 home + '/.bashrc', home + "/.bashrc-backup-" +
                 now.strftime("%Y-%m-%d %H:%M:%S"))
             self.firstrun = 1
             GLib.idle_add(self.setMessage, "Done")
 
         GLib.idle_add(self.setMessage, "Running Skel")
-        GLib.idle_add(self.run)
-
-    def run(self):
-        self.setProgress(0.7)
-        if self.cat.get_active_text() == "polybar":
-            self.ecode = 0
-            print(self.ecode)
-            src = '/etc/skel/.config/polybar/'
-            if not os.path.exists(src):
-                self.ecode = 1
-            else:
-                copy_tree(src,
-                          home + '/.config/polybar/', update=1, preserve_symlinks=1)
-                print("Path copied")
-
-            print(self.ecode)
-        elif self.cat.get_active_text() == "herbstluftwm":
-            self.ecode = 0
-            src = '/etc/skel/.config/herbstluftwm/'
-            if not os.path.exists(src):
-                self.ecode = 1
-            else:
-                copy_tree(src, home + '/.config/herbstluftwm/',
-                          update=1, preserve_symlinks=1)
-                print("Path copied")
-
-        elif self.cat.get_active_text() == "bspwm":
-            self.ecode = 0
-            src = '/etc/skel/.config/bspwm/'
-            if not os.path.exists(src):
-                self.ecode = 1
-            else:
-                copy_tree(src, home + '/.config/bspwm/',
-                          update=1, preserve_symlinks=1)
-                print("Path copied")
-
-        elif self.cat.get_active_text() == "bashrc-latest":
-            self.ecode = 0
-
-            src = '/etc/skel/.bashrc-latest'
-
-            if not os.path.isfile(src):
-                self.ecode = 1
-            else:
-                copy_file(
-                    src, home + "/.bashrc-latest", update=1)
-                print("Path of copied file")
-
-        elif self.cat.get_active_text() == "root configs":
-            self.ecode = 0
-            src1 = '/etc/skel/.bashrc-latest'
-            src2 = '/etc/skel/.dmrc'
-            src3 = '/etc/skel/.face'
-            src4 = '/etc/skel/.inputrc-latest'
-            src5 = '/etc/skel/.xinitrc'
-            src6 = '/etc/skel/.Xresources'
-            src7 = '/etc/skel/.xsession'
-            src8 = '/etc/skel/.xsessionrc'
-
-            if not os.path.isfile(src1):
-                self.ecode = 1
-            else:
-                copy_file(
-                    src1, home + "/.bashrc-latest", update=1)
-
-            if not os.path.isfile(src2):
-                self.ecode = 1
-            else:
-                copy_file(
-                    src2, home + "/.dmrc", update=1)
-
-            if not os.path.isfile(src3):
-                self.ecode = 1
-            else:
-                copy_file(
-                    src3, home + "/.face", update=1)
-
-            if not os.path.isfile(src4):
-                self.ecode = 1
-            else:
-                copy_file(
-                    src4, home + "/.inputrc-latest", update=1)
-
-            if not os.path.isfile(src5):
-                self.ecode = 1
-            else:
-                copy_file(
-                    src5, home + "/.xinitrc", update=1)
-
-            self.setProgress(0.8)
-
-            if not os.path.isfile(src6):
-                self.ecode = 1
-            else:
-                copy_file(
-                    src6, home + "/.Xresources", update=1)
-
-            if not os.path.isfile(src7):
-                self.ecode = 1
-            else:
-                copy_file(
-                    src7, home + "/.xsession", update=1)
-
-            if not os.path.isfile(src8):
-                self.ecode = 1
-            else:
-                copy_file(
-                    src8, home + "/.xsessionrc", update=1)
-
-            print("Root Configs copied")
-
-        elif self.cat.get_active_text() == "locals":
-            self.ecode = 0
-            src1 = '/etc/skel/.local'
-            if not os.path.exists(src1):
-                self.ecode = 1
-            else:
-                copy_tree(src1, home + '/.local',
-                          update=1, preserve_symlinks=1)
-
-            print(".local copied")
-
-        elif self.cat.get_active_text() == "xfce":
-            self.ecode = 0
-            src1 = '/etc/skel/.config/xfce4'
-
-            if not os.path.exists(src1):
-                self.ecode = 1
-            else:
-                copy_tree(src1, home + '/.config/xfce4',
-                          update=1, preserve_symlinks=1)
-
-            self.setProgress(0.8)
-
-            print("xfce copied")
-
-        self.setProgress(1)
-
-        if(self.ecode == 1):
-            self.callBox(1)
+        GLib.idle_add(self.setProgress, 0.8)
+        GLib.idle_add(self.run, active_text)
+        GLib.idle_add(self.setProgress, 1)
+        if(ecode == 1):
+            GLib.idle_add(self.callBox,
+                          "Cant seem to find that source. Have you got it installed?", "Success!!")
         else:
-            self.callBox(0)
+            GLib.idle_add(
+                self.callBox, "Skel executed successfully.", "Success!!")
 
-        self.setProgress(0)
-        self.btn2.set_sensitive(True)
-        self.setMessage("Idle...")
+        GLib.idle_add(self.setProgress, 0)
+        GLib.idle_add(self.btn2.set_sensitive, True)
+        GLib.idle_add(self.setMessage, "Idle...")
 
-    def callBox(self, errorCode):
-        if errorCode == 0:
-            message = "Skel executed successfully."
-            title = "Success!!"
-        else:
-            title = "Error!!"
-            message = "Cant seem to find that source. Have you got it installed?"
+    def callBox(self, message, title):
+        message = message
+        title = title
 
         md = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.INFO,
                                buttons=Gtk.ButtonsType.OK, text=title)
@@ -341,31 +292,131 @@ class HSApp(Gtk.Window):
         md.destroy()
         # self.set_sensitive(True)
 
-    def copytree(self, src, dst, symlinks=False, ignore=None):
+    def run(self, cat):
 
-        if not os.path.exists(dst):
-            os.makedirs(dst)
-        for item in os.listdir(src):
-            s = os.path.join(src, item)
-            d = os.path.join(dst, item)
-            if os.path.exists(d):
-                try:
-                    shutil.rmtree(d)
-                except Exception as e:
-                    print(e)
-                    os.unlink(d)
-            if os.path.isdir(s):
-                try:
-                    shutil.copytree(s, d, symlinks, ignore)
-                except:
-                    print("ERROR2")
-                    self.ecode = 1
+        if cat == "polybar":
+            ecode = 0
+            print(ecode)
+            src = '/etc/skel/.config/polybar/'
+            if not os.path.exists(src):
+                ecode = 1
             else:
-                try:
-                    shutil.copy2(s, d)
-                except:
-                    print("ERROR3")
-                    self.ecode = 1
+                Functions.copytree(self, src,
+                                   home + '/.config/polybar/')
+                print("Path copied")
+
+            print(ecode)
+        elif cat == "herbstluftwm":
+            ecode = 0
+            src = '/etc/skel/.config/herbstluftwm/'
+            if not os.path.exists(src):
+                ecode = 1
+            else:
+                Functions.copytree(self, src, home + '/.config/herbstluftwm/',
+                                   )
+                print("Path copied")
+
+        elif cat == "bspwm":
+            ecode = 0
+            src = '/etc/skel/.config/bspwm/'
+            if not os.path.exists(src):
+                ecode = 1
+            else:
+                Functions.copytree(self, src, home + '/.config/bspwm/'
+                                   )
+                print("Path copied")
+
+        elif cat == "bashrc-latest":
+            ecode = 0
+
+            src = '/etc/skel/.bashrc-latest'
+
+            if not os.path.isfile(src):
+                ecode = 1
+            else:
+                shutil.copy(
+                    src, home + "/.bashrc-latest")
+                print("Path of copied file")
+
+        elif cat == "root configs":
+            ecode = 0
+            src1 = '/etc/skel/'
+
+            if not os.path.exists(src1):
+                ecode = 1
+            else:
+                for filename in os.listdir(src1):
+                    if os.path.isfile(src1 + "/" + filename):
+                        print(filename)
+                        shutil.copy(src1 + "/" + filename,
+                                    home + "/" + filename)
+
+            print("Root Configs copied")
+
+        elif cat == "locals":
+            ecode = 0
+            src1 = '/etc/skel/.local'
+            if not os.path.exists(src1):
+                ecode = 1
+            else:
+                Functions.copytree(self, src1, home + '/.local'
+                                   )
+
+            print(".local copied")
+
+        elif cat == "xfce":
+            ecode = 0
+            src1 = '/etc/skel/.config/xfce4'
+            # src2 = '/etc/skel/.config/xfce4/terminal'
+            # src3 = '/etc/skel/.config/xfce4/xfconf'
+
+            src4 = '/etc/skel/.config/xfce4'
+            src8 = '/etc/skel/.config/autostart'
+
+            if not os.path.exists(src1):
+                ecode = 1
+            else:
+                for folder in os.listdir(src1):
+                    if os.path.isdir(src1 + "/" + folder):
+                        print(folder)
+                        Functions.copytree(
+                            self, src1 + "/" + folder, home + '/.config/xfce4/' + folder)
+
+            # if not os.path.exists(src1):
+            #     ecode = 1
+            # else:
+            #     Functions.copytree(self, src1, home + '/.config/xfce4/panel')
+
+            # if not os.path.exists(src2):
+            #     ecode = 1
+            # else:
+            #     Functions.copytree(self, src2, home +
+            #                        '/.config/xfce4/terminal')
+
+            # if not os.path.exists(src3):
+            #     ecode = 1
+            # else:
+            #     Functions.copytree(self, src3, home + '/.config/xfce4/xfconf')
+
+            if not os.path.exists(src4):
+                ecode = 1
+            else:
+                for filename in os.listdir(src4):
+                    if os.path.isfile(src4 + "/" + filename):
+                        print(filename)
+                        shutil.copy(src4 + "/" + filename,
+                                    home + "/.config/xfce4/" + filename)
+
+            if not os.path.exists(src8):
+                ecode = 1
+            else:
+                for filename in os.listdir(src8):
+                    if os.path.isfile(src8 + "/" + filename):
+                        print(filename)
+                        shutil.copy(src8 + "/" + filename, home + "/.config/autostart/" + filename
+                                    )
+
+            print("xfce copied")
 
 
 def signal_handler(sig, frame):
