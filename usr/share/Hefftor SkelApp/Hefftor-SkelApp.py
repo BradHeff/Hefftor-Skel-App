@@ -108,21 +108,27 @@ class HSApp(Gtk.Window):
         # ListRow 1
         self.listRow4 = Gtk.ListBoxRow()
         self.listRow5 = Gtk.ListBoxRow()
+        self.listRow9 = Gtk.ListBoxRow()
         self.hbox4 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.hbox5 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.hbox9 = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRow4.add(self.hbox4)
         self.listRow5.add(self.hbox5)
+        self.listRow9.add(self.hbox9)
 
         # ListRow 1 Elements
         self.btn4 = Gtk.Button(label="Clean .config")
         self.btn5 = Gtk.Button(label="Clean .local")
         self.btn6 = Gtk.Button(label="Clean .bashrc")
+        self.btn9 = Gtk.Button(label="Clean All Backups")
 
         self.btn4.connect("clicked", self.on_config_clicked)
         self.btn5.connect("clicked", self.on_local_clicked)
         self.btn6.connect("clicked", self.on_bash_clicked)
+        self.btn9.connect("clicked", self.on_flush_clicked)
 
         self.label4 = Gtk.Label(xalign=0)
         self.label4.set_text("Delete Backup Configs")
@@ -130,9 +136,11 @@ class HSApp(Gtk.Window):
         self.hbox4.pack_start(self.btn4, False, False, 0)
         self.hbox4.pack_start(self.btn5, False, False, 0)
         self.hbox4.pack_start(self.btn6, False, False, 0)
+        self.hbox9.pack_end(self.btn9, True, True, 0)
 
         self.listview4.add(self.listRow5)
         self.listview4.add(self.listRow4)
+        self.listview4.add(self.listRow9)
 
         # ===========================================
         #				Third Section
@@ -217,6 +225,19 @@ class HSApp(Gtk.Window):
             if filename.startswith(".bashrc-backup"):
                 os.unlink(home + "/" + bd + "/" + filename)
         self.callBox("bashrc backups cleaned.", "Success!!")
+
+    def on_flush_clicked(self, widget):
+        print("FLUSH!")
+        for filename in os.listdir(home + "/" + bd):
+            if os.path.isdir(home + "/" + bd + "/" + filename):
+                shutil.rmtree(home + "/" + bd + "/" + filename)
+        
+
+        for filename in os.listdir(home + "/" + bd):
+            if os.path.isfile(home + "/" + bd + "/" + filename):
+                os.unlink(home + "/" + bd + "/" + filename)
+        
+        self.callBox(".SkelApp_Backups directory has been cleaned.", "Success!!")
 
     def on_bashrc_skel_clicked(self, widget):
         if self.firstrun == 0:
