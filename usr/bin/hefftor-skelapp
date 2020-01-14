@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 #python3 ~/.local/share/Hefftor\ Skel\ App/Hefftor-Skel-App.py
-python3 /usr/share/Hefftor\ Skel\ App/Hefftor-Skel-App.py
+python3 /usr/share/Hefftor\ SkelApp/Hefftor-SkelApp.py

@@ -1,9 +1,9 @@
 [Desktop Entry]
-Name=Hefftor SkelAp
+Name=Hefftor SkelApp
 GenericName=Skel Config Copy
-X-GNOME-FullName=Hefftor SkelAp
+X-GNOME-FullName=Hefftor SkelApp
 Comment=Copy /etc/skel into your configs
-Exec=hefftor-skel-app
+Exec=hefftor-skelapp
 Icon=hefftorlinux
 Terminal=false
 Type=Application
