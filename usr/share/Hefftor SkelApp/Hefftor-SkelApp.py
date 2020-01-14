@@ -14,8 +14,17 @@ gi.require_version('Gtk', '3.0')
 
 # home = expanduser("~")
 base_dir = os.path.dirname(os.path.realpath(__file__))
-MENU_CATS = ["polybar", "herbstluftwm",
-             "bspwm", "bashrc-latest", "root configs", "locals", "xfce"]
+MENU_CATS = [
+    "polybar", 
+    "herbstluftwm",
+    "bspwm", 
+    "bashrc-latest", 
+    "root configs", 
+    "locals", 
+    "xfce", 
+    "xfce-config", 
+    "hlwm/bspwm configs"
+    ]
 
 
 class HSApp(Gtk.Window):
@@ -29,6 +38,7 @@ class HSApp(Gtk.Window):
         self.connect("delete-event", Gtk.main_quit)
         self.connect("check_resize", self.on_check_resize)
         self.firstrun = 0
+        self.ecode = 0
 
         hb = Gtk.HeaderBar()
         hb.props.show_close_button = True
@@ -269,17 +279,7 @@ class HSApp(Gtk.Window):
         GLib.idle_add(self.setMessage, "Running Skel")
         GLib.idle_add(self.setProgress, 0.8)
         GLib.idle_add(self.run, active_text)
-        GLib.idle_add(self.setProgress, 1)
-        if(ecode == 1):
-            GLib.idle_add(self.callBox,
-                          "Cant seem to find that source. Have you got it installed?", "Success!!")
-        else:
-            GLib.idle_add(
-                self.callBox, "Skel executed successfully.", "Success!!")
-
-        GLib.idle_add(self.setProgress, 0)
-        GLib.idle_add(self.btn2.set_sensitive, True)
-        GLib.idle_add(self.setMessage, "Idle...")
+        
 
     def callBox(self, message, title):
         message = message
@@ -295,55 +295,56 @@ class HSApp(Gtk.Window):
     def run(self, cat):
 
         if cat == "polybar":
-            ecode = 0
-            print(ecode)
+            self.ecode = 0
+            print(self.ecode)
             src = '/etc/skel/.config/polybar/'
             if not os.path.exists(src):
-                ecode = 1
+                self.ecode = 1
             else:
                 Functions.copytree(self, src,
                                    home + '/.config/polybar/')
                 print("Path copied")
 
-            print(ecode)
+            print(self.ecode)
         elif cat == "herbstluftwm":
-            ecode = 0
+            self.ecode = 0
             src = '/etc/skel/.config/herbstluftwm/'
             if not os.path.exists(src):
-                ecode = 1
+                self.ecode = 1
+                print(self.ecode)
             else:
                 Functions.copytree(self, src, home + '/.config/herbstluftwm/',
                                    )
                 print("Path copied")
 
         elif cat == "bspwm":
-            ecode = 0
+            self.ecode = 0
             src = '/etc/skel/.config/bspwm/'
             if not os.path.exists(src):
-                ecode = 1
+                self.ecode = 1
             else:
                 Functions.copytree(self, src, home + '/.config/bspwm/'
                                    )
                 print("Path copied")
 
         elif cat == "bashrc-latest":
-            ecode = 0
+            self.ecode = 0
 
             src = '/etc/skel/.bashrc-latest'
 
             if not os.path.isfile(src):
-                ecode = 1
+                self.ecode = 1
             else:
                 shutil.copy(
                     src, home + "/.bashrc-latest")
                 print("Path of copied file")
 
         elif cat == "root configs":
-            ecode = 0
+            self.ecode = 0
             src1 = '/etc/skel/'
 
             if not os.path.exists(src1):
-                ecode = 1
+                self.ecode = 1
             else:
                 for filename in os.listdir(src1):
                     if os.path.isfile(src1 + "/" + filename):
@@ -354,10 +355,10 @@ class HSApp(Gtk.Window):
             print("Root Configs copied")
 
         elif cat == "locals":
-            ecode = 0
+            self.ecode = 0
             src1 = '/etc/skel/.local'
             if not os.path.exists(src1):
-                ecode = 1
+                self.ecode = 1
             else:
                 Functions.copytree(self, src1, home + '/.local'
                                    )
@@ -365,7 +366,7 @@ class HSApp(Gtk.Window):
             print(".local copied")
 
         elif cat == "xfce":
-            ecode = 0
+            self.ecode = 0
             src1 = '/etc/skel/.config/xfce4'
             # src2 = '/etc/skel/.config/xfce4/terminal'
             # src3 = '/etc/skel/.config/xfce4/xfconf'
@@ -374,7 +375,7 @@ class HSApp(Gtk.Window):
             src8 = '/etc/skel/.config/autostart'
 
             if not os.path.exists(src1):
-                ecode = 1
+                self.ecode = 1
             else:
                 for folder in os.listdir(src1):
                     if os.path.isdir(src1 + "/" + folder):
@@ -382,24 +383,8 @@ class HSApp(Gtk.Window):
                         Functions.copytree(
                             self, src1 + "/" + folder, home + '/.config/xfce4/' + folder)
 
-            # if not os.path.exists(src1):
-            #     ecode = 1
-            # else:
-            #     Functions.copytree(self, src1, home + '/.config/xfce4/panel')
-
-            # if not os.path.exists(src2):
-            #     ecode = 1
-            # else:
-            #     Functions.copytree(self, src2, home +
-            #                        '/.config/xfce4/terminal')
-
-            # if not os.path.exists(src3):
-            #     ecode = 1
-            # else:
-            #     Functions.copytree(self, src3, home + '/.config/xfce4/xfconf')
-
             if not os.path.exists(src4):
-                ecode = 1
+                self.ecode = 1
             else:
                 for filename in os.listdir(src4):
                     if os.path.isfile(src4 + "/" + filename):
@@ -408,7 +393,7 @@ class HSApp(Gtk.Window):
                                     home + "/.config/xfce4/" + filename)
 
             if not os.path.exists(src8):
-                ecode = 1
+                self.ecode = 1
             else:
                 for filename in os.listdir(src8):
                     if os.path.isfile(src8 + "/" + filename):
@@ -418,7 +403,49 @@ class HSApp(Gtk.Window):
 
             print("xfce copied")
 
+        elif cat == "xfce-config":
+            self.ecode = 0
+            list = ["fontconfig","galculator","gtk-3.0","htop","nano","nomacs","qt5ct","volumeicon","mimeapps.list","Trolltech.conf","yad.conf"]
+            for item in list:                
+                if os.path.isdir("/etc/skel/.config/" + item):
+                    Functions.copytree(
+                        self, "/etc/skel/.config/" + item, home + '/.config/' + item)
 
+                if os.path.isfile("/etc/skel/.config/" + item):
+                    shutil.copy("/etc/skel/.config/" + item, home + "/.config/" + item)
+
+            print("xfce copied")
+        elif cat == "hlwm/bspwm configs":
+            self.ecode = 0
+            src1 = '/etc/skel/.config/herbstluftwm/'
+            src2 = '/etc/skel/.config/bspwm/'
+            if not os.path.exists(src1) or not os.path.exists(src2):
+                print("DOES NOT EXIST")
+                self.ecode = 1
+            else:
+                list = ["dunst","fontconfig","galculator","gtk-3.0","htop","nano","nomacs","qt5ct","ranger","rofi","volumeicon","mimeapps.list","Trolltech.conf","yad.conf"]
+                for item in list:                
+                    if os.path.isdir("/etc/skel/.config/" + item):
+                        Functions.copytree(
+                            self, "/etc/skel/.config/" + item, home + '/.config/' + item)
+
+                    if os.path.isfile("/etc/skel/.config/" + item):
+                        shutil.copy("/etc/skel/.config/" + item, home + "/.config/" + item)
+
+                print("hlwm-config copied")
+
+        self.setProgress(1)
+        print("ErrorCode: ",self.ecode)
+        if(self.ecode == 1):
+            self.callBox("Cant seem to find that source. Have you got it installed?", "Success!!")
+        else:
+            self.callBox("Skel executed successfully.", "Success!!")
+
+        self.setProgress(0)
+        self.btn2.set_sensitive(True)
+        self.setMessage("Idle...")
+
+        
 def signal_handler(sig, frame):
     print('\nYou pressed Ctrl+C!\nFreechoice Menu GUI is Closing.')
     Gtk.main_quit(0)

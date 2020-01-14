@@ -4,7 +4,6 @@ from os.path import expanduser
 import os
 import shutil
 home = expanduser("~")
-ecode = 0
 
 
 class Functions(object):
