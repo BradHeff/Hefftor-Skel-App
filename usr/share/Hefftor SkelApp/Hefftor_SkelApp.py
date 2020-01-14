@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import Functions
 from Functions import *
+
 import threading
 import datetime
 # from os.path import expanduser
@@ -15,17 +16,21 @@ gi.require_version('Gtk', '3.0')
 # home = expanduser("~")
 base_dir = os.path.dirname(os.path.realpath(__file__))
 MENU_CATS = [
-    "polybar Configs", 
+    "polybar Configs",
     "herbstluftwm Configs",
-    "bspwm Configs", 
-    "root Configs", 
-    "Local Configs", 
-    "xfce Configs", 
-    "xfce-config package", 
+    "bspwm Configs",
+    "root Configs",
+    "Local Configs",
+    "Conky Configs",
+    "dconf Configs",
+    "xfce Configs",
+    "xfce-config package",
     "hlwm/bspwm configs package"
-    ]
+]
 
 bd = "/.SkelApp_Backups"
+
+
 class HSApp(Gtk.Window):
     def __init__(self):
         super(HSApp, self).__init__()
@@ -120,14 +125,16 @@ class HSApp(Gtk.Window):
         self.listRow9.add(self.hbox9)
 
         # ListRow 1 Elements
-        self.btn4 = Gtk.Button(label="Clean .config")
-        self.btn5 = Gtk.Button(label="Clean .local")
-        self.btn6 = Gtk.Button(label="Clean .bashrc")
-        self.btn9 = Gtk.Button(label="Clean All Backups")
+        self.btn4  = Gtk.Button(label="Clean .config")
+        self.btn5  = Gtk.Button(label="Clean .local ")
+        self.btn6  = Gtk.Button(label="Clean .bashrc")
+        self.btn10 = Gtk.Button(label="Clean conky  ")
+        self.btn9  = Gtk.Button(label="Clean All Backups")
 
         self.btn4.connect("clicked", self.on_config_clicked)
         self.btn5.connect("clicked", self.on_local_clicked)
         self.btn6.connect("clicked", self.on_bash_clicked)
+        self.btn10.connect("clicked", self.on_conky_clicked)
         self.btn9.connect("clicked", self.on_flush_clicked)
 
         self.label4 = Gtk.Label(xalign=0)
@@ -137,6 +144,7 @@ class HSApp(Gtk.Window):
         self.hbox4.pack_start(self.btn5, False, False, 0)
         self.hbox4.pack_start(self.btn6, False, False, 0)
         self.hbox9.pack_end(self.btn9, True, True, 0)
+        self.hbox9.pack_start(self.btn10, False, False, 0)
 
         self.listview4.add(self.listRow5)
         self.listview4.add(self.listRow4)
@@ -207,6 +215,7 @@ class HSApp(Gtk.Window):
         self.hbox3.pack_start(self.label3, True, False, 0)
         self.listview3.add(self.listRow3)
 
+
     def on_config_clicked(self, widget):
         for filename in os.listdir(home + "/" + bd):
             if filename.startswith(".config_backup"):
@@ -225,6 +234,15 @@ class HSApp(Gtk.Window):
             if filename.startswith(".bashrc-backup"):
                 os.unlink(home + "/" + bd + "/" + filename)
         self.callBox("bashrc backups cleaned.", "Success!!")
+
+    def on_conky_clicked(self, widget):
+        for filename in os.listdir(home + "/" + bd):
+            if filename.startswith(".conkyrc-backup"):
+                os.unlink(home + "/" + bd + "/" + filename)
+        for filename in os.listdir(home + "/" + bd):
+            if filename.startswith(".lua_backup"):
+                shutil.rmtree(home + "/" + bd + "/" + filename)
+        self.callBox("conky backups cleaned.", "Success!!")
 
     def on_flush_clicked(self, widget):
         print("FLUSH!")
@@ -285,15 +303,39 @@ class HSApp(Gtk.Window):
         if self.firstrun == 0:
             
             GLib.idle_add(self.setProgress, 0.1)
+
+            #============================
+            #       CONFIG
+            #============================
+
             Functions.copytree(self, home + '/.config', home + '/' + bd + '/.config_backup-' +
                                now.strftime("%Y-%m-%d %H:%M:%S"))
             GLib.idle_add(self.setProgress, 0.3)
+            
+            #============================
+            #       LOACAL
+            #============================
+
             Functions.copytree(self, home + '/.local', home + '/' + bd + '/.local_backup-' +
                                now.strftime("%Y-%m-%d %H:%M:%S"))
             GLib.idle_add(self.setProgress, 0.5)
+            
+            #============================
+            #       BASH
+            #============================
             shutil.copy(
                 home + '/.bashrc', home + "/" + bd + "/.bashrc-backup-" +
                 now.strftime("%Y-%m-%d %H:%M:%S"))
+            
+            #============================
+            #       CONKY
+            #============================
+            Functions.copytree(self, home + '/.lua', home + '/' + bd + '/.lua_backup-' +
+                               now.strftime("%Y-%m-%d %H:%M:%S"))
+            shutil.copy(
+                home + '/.conkyrc', home + "/" + bd + "/.conkyrc-backup-" +
+                now.strftime("%Y-%m-%d %H:%M:%S"))
+            
             self.firstrun = 1
             GLib.idle_add(self.setMessage, "Done")
 
@@ -370,6 +412,29 @@ class HSApp(Gtk.Window):
                 self.ecode = 1
             else:
                 Functions.copytree(self, src1, home + '/.local'
+                                   )
+
+            print(".local copied")
+
+        elif cat == "Conky Configs":
+            self.ecode = 0
+            src1 = '/etc/skel/.lua'
+            src2 = '/etc/skel/.conkyrc'
+            if not os.path.exists(src1) or not os.path.isfile(src2):
+                self.ecode = 1
+            else:
+                Functions.copytree(self, src1, home + '/.lua')
+                shutil.copy(src2, home + '/.conkyrc')
+
+            print("Conky copied")
+
+        elif cat == "dconf Configs":
+            self.ecode = 0
+            src1 = '/etc/skel/.config/dconf'
+            if not os.path.exists(src1):
+                self.ecode = 1
+            else:
+                Functions.copytree(self, src1, home + '/.config/dconf'
                                    )
 
             print(".local copied")
@@ -454,7 +519,7 @@ class HSApp(Gtk.Window):
         self.btn2.set_sensitive(True)
         self.setMessage("Idle...")
 
-        
+
 def signal_handler(sig, frame):
     print('\nYou pressed Ctrl+C!\nFreechoice Menu GUI is Closing.')
     Gtk.main_quit(0)
