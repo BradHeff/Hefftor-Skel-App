@@ -25,7 +25,7 @@ MENU_CATS = [
     "hlwm/bspwm configs package"
     ]
 
-
+bd = "/.SkelApp_Backups"
 class HSApp(Gtk.Window):
     def __init__(self):
         super(HSApp, self).__init__()
@@ -200,22 +200,22 @@ class HSApp(Gtk.Window):
         self.listview3.add(self.listRow3)
 
     def on_config_clicked(self, widget):
-        for filename in os.listdir(home):
+        for filename in os.listdir(home + "/" + bd):
             if filename.startswith(".config_backup"):
-                shutil.rmtree(home + "/" + filename)
+                shutil.rmtree(home + "/" + bd + "/" + filename)
         self.callBox("Config backups cleaned.", "Success!!")
 
     def on_local_clicked(self, widget):
-        for filename in os.listdir(home):
+        for filename in os.listdir(home + "/" + bd):
             if filename.startswith(".local_backup"):
-                shutil.rmtree(home + "/" + filename)
+                shutil.rmtree(home + "/" + bd + "/" + filename)
         self.callBox("local backups cleaned.", "Success!!")
 
     def on_bash_clicked(self, widget):
 
-        for filename in os.listdir(home):
+        for filename in os.listdir(home + "/" + bd):
             if filename.startswith(".bashrc-backup"):
-                os.unlink(home + "/" + filename)
+                os.unlink(home + "/" + bd + "/" + filename)
         self.callBox("bashrc backups cleaned.", "Success!!")
 
     def on_bashrc_skel_clicked(self, widget):
@@ -223,7 +223,7 @@ class HSApp(Gtk.Window):
             now = datetime.datetime.now()
             self.setMessage("Running Backup")
             shutil.copy(
-                home + '/.bashrc', home + "/.bashrc-backup-" +
+                home + '/.bashrc', home + "/" + bd + "/.bashrc-backup-" +
                 now.strftime("%Y-%m-%d %H:%M:%S"))
             
             GLib.idle_add(self.setMessage, "Done")
@@ -262,15 +262,16 @@ class HSApp(Gtk.Window):
     def processing(self, active_text):
         now = datetime.datetime.now()
         if self.firstrun == 0:
+            
             GLib.idle_add(self.setProgress, 0.1)
-            Functions.copytree(self, home + '/.config', home + '/.config_backup-' +
+            Functions.copytree(self, home + '/.config', home + '/' + bd + '/.config_backup-' +
                                now.strftime("%Y-%m-%d %H:%M:%S"))
             GLib.idle_add(self.setProgress, 0.3)
-            Functions.copytree(self, home + '/.local', home + '/.local_backup-' +
+            Functions.copytree(self, home + '/.local', home + '/' + bd + '/.local_backup-' +
                                now.strftime("%Y-%m-%d %H:%M:%S"))
             GLib.idle_add(self.setProgress, 0.5)
             shutil.copy(
-                home + '/.bashrc', home + "/.bashrc-backup-" +
+                home + '/.bashrc', home + "/" + bd + "/.bashrc-backup-" +
                 now.strftime("%Y-%m-%d %H:%M:%S"))
             self.firstrun = 1
             GLib.idle_add(self.setMessage, "Done")
