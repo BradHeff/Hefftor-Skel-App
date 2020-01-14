@@ -258,14 +258,14 @@ class HSApp(Gtk.Window):
         self.callBox(".SkelApp_Backups directory has been cleaned.", "Success!!")
 
     def on_bashrc_skel_clicked(self, widget):
-        if self.firstrun == 0:
-            now = datetime.datetime.now()
-            self.setMessage("Running Backup")
-            shutil.copy(
-                home + '/.bashrc', home + "/" + bd + "/.bashrc-backup-" +
-                now.strftime("%Y-%m-%d %H:%M:%S"))
-            
-            GLib.idle_add(self.setMessage, "Done")
+        
+        now = datetime.datetime.now()
+        self.setMessage("Running Backup")
+        shutil.copy(
+            home + '/.bashrc', home + "/" + bd + "/.bashrc-backup-" +
+            now.strftime("%Y-%m-%d %H:%M:%S"))
+        
+        GLib.idle_add(self.setMessage, "Done")
         shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
         self.callBox("bashrc upgraded", "Success!!")
         self.setMessage("Idle...")
