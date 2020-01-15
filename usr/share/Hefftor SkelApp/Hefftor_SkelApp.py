@@ -78,7 +78,7 @@ class HSApp(Gtk.Window):
         self.listviewHDR.add(self.listRowHDR)
 
         # ===========================================
-        #				First Section
+        #				MENU Section
         # ===========================================
         self.listview1 = Gtk.ListBox()
         self.listview1.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -98,7 +98,7 @@ class HSApp(Gtk.Window):
         self.labelmessage = Gtk.Label(xalign=0)
         self.labelmessage.set_markup("<span>Select a category from the dropdown menu and click <b>Run Skel</b> to\n update that specific config from <b>/etc/skel</b> to your home\n directory\n</span>")
         self.label1 = Gtk.Label(xalign=0)
-        self.label1.set_text("Category     ")
+        self.label1.set_markup("<b>Select Category</b>")
         self.cat = Gtk.ComboBoxText()
         for CATS in MENU_CATS:
             self.cat.append_text(CATS)
@@ -112,7 +112,7 @@ class HSApp(Gtk.Window):
         self.listview1.add(self.listRow1)
 
         # ===========================================
-        #				Second Section
+        #				BACKUPS Section
         # ===========================================
         self.listview4 = Gtk.ListBox()
         self.listview4.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -120,17 +120,19 @@ class HSApp(Gtk.Window):
 
         # ListRow 1
         self.listRow4 = Gtk.ListBoxRow()
+        self.listRow5 = Gtk.ListBoxRow()
         self.listRow9 = Gtk.ListBoxRow()
         self.hbox4 = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.hbox5 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.hbox9 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRow4.add(self.hbox4)
+        self.listRow5.add(self.hbox5)
         self.listRow9.add(self.hbox9)
 
         # ListRow 1 Elements
-        self.label1 = Gtk.Label(xalign=0)
-        self.label1.set_text("Backups     ")
         self.backs = Gtk.ComboBoxText()
         self.refresh()
         self.backs.set_active(0)
@@ -144,19 +146,20 @@ class HSApp(Gtk.Window):
         self.btn9.connect("clicked", self.on_flush_clicked)
 
         self.label4 = Gtk.Label(xalign=0)
-        self.label4.set_text("Delete Backups")
+        self.label4.set_markup("<b>Delete Backups</b>")
         
-        self.hbox4.pack_start(self.label4, True, False, 0)
+        self.hbox5.pack_start(self.label4, True, True, 0)
         self.hbox4.pack_start(self.backs, True, True, 0)
         self.hbox4.pack_start(self.btn4, False, False, 0)
-        self.hbox9.pack_end(self.btn5, True, True, 0)
+        self.hbox4.pack_end(self.btn5, True, True, 0)
         self.hbox9.pack_start(self.btn9, True, True, 0)
         
+        self.listview4.add(self.listRow5)
         self.listview4.add(self.listRow4)
         self.listview4.add(self.listRow9)
 
         # ===========================================
-        #				Third Section
+        #				BASHRC Section
         # ===========================================
         self.listview2 = Gtk.ListBox()
         self.listview2.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -164,19 +167,27 @@ class HSApp(Gtk.Window):
 
         # ListRow 1
         self.listRow2 = Gtk.ListBoxRow()
+        self.listRow7 = Gtk.ListBoxRow()
         self.hbox2 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.hbox7 = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRow2.add(self.hbox2)
+        self.listRow7.add(self.hbox7)
 
         # ListRow 1 Elements
+        self.label7 = Gtk.Label(xalign=0)
+        self.label7.set_markup("<b>Apply New .bashrc</b>")
         self.btn7 = Gtk.Button(label="Run Bashrc Upgrade")
         self.btn7.connect("clicked", self.on_bashrc_skel_clicked)
 
-        self.hbox2.pack_end(self.btn7, False, False, 0)
+        self.hbox2.pack_end(self.btn7, True, True, 0)
+        self.hbox7.pack_start(self.label7, True, True, 0)
+        self.listview2.add(self.listRow7)
         self.listview2.add(self.listRow2)
 
         # ===========================================
-        #				Fourth Section
+        #				RUN Section
         # ===========================================
         self.listview6 = Gtk.ListBox()
         self.listview6.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -192,16 +203,18 @@ class HSApp(Gtk.Window):
         self.btn2 = Gtk.Button(label="Run Skel")
         self.btn2.connect("clicked", self.on_button_fetch_clicked)
         self.label4 = Gtk.Label(xalign=0)
-        self.label4.set_text("Idle...")
+        self.label4.set_markup("<i>Idle...</i>")
 
-        self.hbox6.pack_end(self.btn2, False, False, 0)
-        self.hbox6.pack_start(self.label4, False, True, 0)
+        self.hbox6.pack_end(self.btn2, True, True, 0)
+        self.hbox6.pack_start(self.label4, True, True, 0)
         self.listview6.add(self.listRow6)
 
         self.progressbar = Gtk.ProgressBar()
         self.vbox.pack_start(self.progressbar, True, True, 0)
+
+
         # ===========================================
-        #				Second Section
+        #				FOOTER Section
         # ===========================================
         self.listview3 = Gtk.ListBox()
         self.listview3.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -220,7 +233,11 @@ class HSApp(Gtk.Window):
         self.hbox3.pack_start(self.label3, True, False, 0)
         self.listview3.add(self.listRow3)
 
+#===========================================================================================================
 
+    # ===========================================
+    #			DELETE BACKUP Section
+    # ===========================================
     def on_delete_clicked(self, widget):
         for filename in os.listdir(home + "/" + bd):
             if filename == self.backs.get_active_text():
@@ -228,6 +245,9 @@ class HSApp(Gtk.Window):
         self.refresh()
         self.callBox("Config backups cleaned.", "Success!!")
 
+    # ===========================================
+    #			REFRESH BACKUP Section
+    # ===========================================
     def refresh(self):
         self.backs.get_model().clear()
         BACKUPS_CATS = []
@@ -244,6 +264,9 @@ class HSApp(Gtk.Window):
         self.refresh()
         
 
+    # ===========================================
+    #		DELETE ALL BACKUP Section
+    # ===========================================
     def on_flush_clicked(self, widget):
         print("FLUSH!")
         for filename in os.listdir(home + "/" + bd):
@@ -257,6 +280,9 @@ class HSApp(Gtk.Window):
         self.refresh()
         self.callBox(".SkelApp_Backups directory has been cleaned.", "Success!!")
 
+    # ===========================================
+    #			UPGRADE BASHRC Section
+    # ===========================================
     def on_bashrc_skel_clicked(self, widget):
         
         now = datetime.datetime.now()
@@ -273,6 +299,25 @@ class HSApp(Gtk.Window):
         self.callBox("bashrc upgraded", "Success!!")
         self.setMessage("Idle...")
 
+    # ===========================================
+    #			RUN SKEL Section
+    # ===========================================
+    def on_button_fetch_clicked(self, widget):
+
+        self.btn2.set_sensitive(False)
+        if self.firstrun == 0:
+            self.setMessage("Running Backup")
+
+        t1 = threading.Thread(target=self.processing,
+                              args=(self.cat.get_active_text(),))
+        t1.daemon = True
+        t1.start()
+
+
+# =========================================================================================================
+#			                       FUNCTIONS Section
+# =========================================================================================================
+    
     def setProgress(self, value):
         self.progressbar.set_fraction(value)
 
@@ -287,20 +332,12 @@ class HSApp(Gtk.Window):
         self.resizeImage(boxAllocation.width,
                          boxAllocation.height)
 
-    def on_button_fetch_clicked(self, widget):
-
-        self.btn2.set_sensitive(False)
-        if self.firstrun == 0:
-            self.setMessage("Running Backup")
-
-        t1 = threading.Thread(target=self.processing,
-                              args=(self.cat.get_active_text(),))
-        t1.daemon = True
-        t1.start()
-
     def setMessage(self, message):
         self.label4.set_text(message)
-
+    
+    # ===========================================
+    #		BACKUP BEFORE SKEL FUNCTION
+    # ===========================================
     def processing(self, active_text):
         now = datetime.datetime.now()
         if self.firstrun == 0:
@@ -345,8 +382,12 @@ class HSApp(Gtk.Window):
         GLib.idle_add(self.setMessage, "Running Skel")
         GLib.idle_add(self.setProgress, 0.8)
         GLib.idle_add(self.run, active_text)
+        GLib.idle_add(self.refresh)
         
 
+    # ===========================================
+    #		MESSAGEBOX FUNCTION
+    # ===========================================
     def callBox(self, message, title):
         message = message
         title = title
@@ -358,8 +399,14 @@ class HSApp(Gtk.Window):
         md.destroy()
         # self.set_sensitive(True)
 
+    # ===========================================
+    #		SKEL FUNCTION
+    # ===========================================
     def run(self, cat):
 
+        # ===========================================
+        #		POLYBAR
+        # ===========================================
         if cat == "polybar Configs":
             self.ecode = 0
             print(self.ecode)
@@ -372,6 +419,10 @@ class HSApp(Gtk.Window):
                 print("Path copied")
 
             print(self.ecode)
+        
+        # ===========================================
+        #		HERBSTLUFTWM
+        # ===========================================
         elif cat == "herbstluftwm Configs":
             self.ecode = 0
             src = '/etc/skel/.config/herbstluftwm/'
@@ -383,6 +434,9 @@ class HSApp(Gtk.Window):
                                    )
                 print("Path copied")
 
+        # ===========================================
+        #		BSPWM
+        # ===========================================
         elif cat == "bspwm Configs":
             self.ecode = 0
             src = '/etc/skel/.config/bspwm/'
@@ -393,6 +447,9 @@ class HSApp(Gtk.Window):
                                    )
                 print("Path copied")
 
+        # ===========================================
+        #		ROOT
+        # ===========================================
         elif cat == "root Configs":
             self.ecode = 0
             src1 = '/etc/skel/'
@@ -408,6 +465,9 @@ class HSApp(Gtk.Window):
 
             print("Root Configs copied")
 
+        # ===========================================
+        #		LOCALS
+        # ===========================================
         elif cat == "Local Configs":
             self.ecode = 0
             src1 = '/etc/skel/.local'
@@ -418,7 +478,10 @@ class HSApp(Gtk.Window):
                                    )
 
             print(".local copied")
-
+        
+        # ===========================================
+        #		CONKY
+        # ===========================================
         elif cat == "Conky Configs":
             self.ecode = 0
             src1 = '/etc/skel/.lua'
@@ -431,6 +494,9 @@ class HSApp(Gtk.Window):
 
             print("Conky copied")
 
+        # ===========================================
+        #		DCONF
+        # ===========================================
         elif cat == "dconf Configs":
             self.ecode = 0
             src1 = '/etc/skel/.config/dconf'
@@ -442,6 +508,9 @@ class HSApp(Gtk.Window):
 
             print(".local copied")
 
+        # ===========================================
+        #		XFCE
+        # ===========================================
         elif cat == "xfce Configs":
             self.ecode = 0
             src1 = '/etc/skel/.config/xfce4'
@@ -480,6 +549,9 @@ class HSApp(Gtk.Window):
 
             print("xfce copied")
 
+        # ===========================================
+        #		XFCE_CONFIGS PACKAGE
+        # ===========================================
         elif cat == "xfce-config package":
             self.ecode = 0
             list = ["fontconfig","galculator","gtk-3.0","htop","nano","nomacs","qt5ct", "rofi", "volumeicon","mimeapps.list","Trolltech.conf","yad.conf"]
@@ -492,6 +564,10 @@ class HSApp(Gtk.Window):
                     shutil.copy("/etc/skel/.config/" + item, home + "/.config/" + item)
 
             print("xfce copied")
+
+        # ===========================================
+        #		HLWM/BSPWM CONFIGS PACKAGE
+        # ===========================================
         elif cat == "hlwm/bspwm configs package":
             self.ecode = 0
             src1 = '/etc/skel/.config/herbstluftwm/'
@@ -521,6 +597,8 @@ class HSApp(Gtk.Window):
         self.setProgress(0)
         self.btn2.set_sensitive(True)
         self.setMessage("Idle...")
+
+#============================================================================================================
 
 
 def signal_handler(sig, frame):
