@@ -76,7 +76,8 @@ class Help(Gtk.Window):
         self.label1 = Gtk.Label(xalign=0)
         self.label1.set_line_wrap(True)
         self.label1.set_markup(
-            "Select a category from the dropdown menu, this item selected will indicate what it is you want to apply from <span foreground='cyan' weight='bold'>/etc/skel</span> to your home directory")
+            "Select a category from the dropdown menu, this item selected will indicate what it is \
+you want to apply from <span foreground='cyan' weight='bold'>/etc/skel</span> to your home directory")
 
         self.hboxTitle.pack_start(self.labelTitle1, False, False, 0)
         self.hbox1.pack_start(self.label1, False, False, 0)
@@ -129,7 +130,9 @@ class Help(Gtk.Window):
         self.label3 = Gtk.Label(xalign=0)
         self.label3.set_line_wrap(True)
         self.label3.set_markup(
-            "Now that we have our category from the dropdown menu selected, its time we run the application. Click <span foreground='cyan' weight='bold'>Run Skel</span> button to apply the dotfiles from <span foreground='cyan' weight='bold'>/etc/skel</span> to your home directory")
+            "Now that we have our category from the dropdown menu selected, its time we run the application. \
+Click <span foreground='cyan' weight='bold'>Run Skel</span> button to apply the dotfiles from \
+<span foreground='cyan' weight='bold'>/etc/skel</span> to your home directory")
 
         self.hboxTitle2.pack_start(self.labelTitle2, False, False, 0)
         self.hbox3.pack_start(self.label3, False, False, 0)
@@ -182,7 +185,14 @@ class Help(Gtk.Window):
         self.label5 = Gtk.Label(xalign=0)
         self.label5.set_line_wrap(True)
         self.label5.set_markup(
-            "When the application is opened and you click <span foreground='cyan' weight='bold'>Run Skel</span> for the first time. The application will do a full backup of <span foreground='cyan' weight='bold'>.config, .local, .conkyrc and .bashrc</span>. The backups are listed in the backup section of the application.\nAfter selecting a backup from the dropdown list, Clicking <span foreground='cyan' weight='bold'>Delete</span> button will remove all backups contained within the backup directory for that hour.\n<span foreground='cyan' weight='bold' size='large' stretch='semiexpanded'><u>EXAMPLE</u></span>\n<b>Backup-2020-01-15 23</b>\n2020-01-15 = the date of the backup\n23 = the hour of the backup\nSo every backup made within that hour will be placed in that folder.")
+            "When the application is opened and you click <span foreground='cyan' weight='bold'>Run Skel</span> \
+for the first time. The application will do a full backup of <span foreground='cyan' weight='bold'>.config, \
+.local, .conkyrc and .bashrc</span>. The backups are listed in the backup section of the application.\n\
+After selecting a backup from the dropdown list, Clicking <span foreground='cyan' weight='bold'>Delete\
+</span> button will remove all backups contained within the backup directory for that hour.\n\
+<span foreground='cyan' weight='bold' size='large' stretch='semiexpanded'><u>EXAMPLE</u></span>\n\
+<b>Backup-2020-01-15 23</b>\n2020-01-15 = the date of the backup\n23 = the hour of the \
+backup\nSo every backup made within that hour will be placed in that folder.")
 
         self.hboxTitle3.pack_start(self.labelTitle3, False, False, 0)
         self.hbox5.pack_start(self.label5, False, False, 0)
@@ -210,7 +220,7 @@ class Help(Gtk.Window):
         self.hbox6.pack_start(self.image3, False, False, 0)
         self.listview6.add(self.listRow6)
 
-# ===================================================================================================================================
+# ===============================================================================================================================
 
     def resizeImage(self, x, y):
         pixbuf = self.pixbufH.scale_simple(x, y,
