@@ -86,11 +86,17 @@ class HSApp(Gtk.Window):
 
         # ListRow 1
         self.listRow1 = Gtk.ListBoxRow()
+        self.listRowmessage = Gtk.ListBoxRow()
         self.hbox1 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.hboxmessage = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRow1.add(self.hbox1)
+        self.listRowmessage.add(self.hboxmessage)
 
         # ListRow 1 Elements
+        self.labelmessage = Gtk.Label(xalign=0)
+        self.labelmessage.set_markup("<span>Select a category from the dropdown menu and click\n <b>Run Skel</b> to update that specific config from <b>/etc/skel</b> to\n your home directory\n</span>")
         self.label1 = Gtk.Label(xalign=0)
         self.label1.set_text("Category     ")
         self.cat = Gtk.ComboBoxText()
@@ -99,8 +105,10 @@ class HSApp(Gtk.Window):
         self.cat.set_active(0)
         self.cat.set_size_request(170, 0)
 
+        self.hboxmessage.pack_start(self.labelmessage, True, True, 0)
         self.hbox1.pack_start(self.label1, False, False, 0)
         self.hbox1.pack_end(self.cat, True, True, 0)
+        self.listview1.add(self.listRowmessage)
         self.listview1.add(self.listRow1)
 
         # ===========================================
@@ -479,7 +487,7 @@ class HSApp(Gtk.Window):
 
         elif cat == "xfce-config package":
             self.ecode = 0
-            list = ["fontconfig","galculator","gtk-3.0","htop","nano","nomacs","qt5ct","volumeicon","mimeapps.list","Trolltech.conf","yad.conf"]
+            list = ["fontconfig","galculator","gtk-3.0","htop","nano","nomacs","qt5ct", "rofi", "volumeicon","mimeapps.list","Trolltech.conf","yad.conf"]
             for item in list:                
                 if os.path.isdir("/etc/skel/.config/" + item):
                     Functions.copytree(
