@@ -458,9 +458,9 @@ class HSApp(Gtk.Window):
                 self.ecode = 1
             else:
                 for filename in os.listdir(src1):
-                    if os.path.isfile(src1 + "/" + filename):
+                    if os.path.isfile(src1 + filename):
                         print(filename)
-                        shutil.copy(src1 + "/" + filename,
+                        shutil.copy(src1 + filename,
                                     home + "/" + filename)
 
             print("Root Configs copied")
@@ -470,12 +470,19 @@ class HSApp(Gtk.Window):
         # ===========================================
         elif cat == "Local Configs":
             self.ecode = 0
-            src1 = '/etc/skel/.local'
-            if not os.path.exists(src1):
+            src1 = '/etc/skel/.local/bin'
+            src2 = '/etc/skel/.local/share'
+            
+            if not os.path.exists(src1) or not os.path.exists(src2):
                 self.ecode = 1
             else:
-                Functions.copytree(self, src1, home + '/.local'
-                                   )
+                for filename in os.listdir(src1):
+                    shutil.copy(src1 + "/" + filename, home + '/.local/bin/' + filename)
+                
+                for filename in os.listdir(src2):
+                    if os.path.exists(src2 + "/" + filename) and filename != "xfce4":
+                        print(filename)
+                        Functions.copytree(self, src2 + "/" + filename, home + '/.local/share/' + filename)
 
             print(".local copied")
         
@@ -514,10 +521,7 @@ class HSApp(Gtk.Window):
         elif cat == "xfce Configs":
             self.ecode = 0
             src1 = '/etc/skel/.config/xfce4'
-            # src2 = '/etc/skel/.config/xfce4/terminal'
-            # src3 = '/etc/skel/.config/xfce4/xfconf'
-
-            src4 = '/etc/skel/.config/xfce4'
+            src4 = '/etc/skel/.config/Thunar'
             src8 = '/etc/skel/.config/autostart'
 
             if not os.path.exists(src1):
@@ -525,25 +529,25 @@ class HSApp(Gtk.Window):
             else:
                 for folder in os.listdir(src1):
                     if os.path.isdir(src1 + "/" + folder):
-                        print(folder)
                         Functions.copytree(
                             self, src1 + "/" + folder, home + '/.config/xfce4/' + folder)
+                    elif os.path.isfile(src1 + "/" + folder):
+                        shutil.copy(src1 + "/" + folder,
+                                    home + "/.config/xfce4/" + folder)
 
             if not os.path.exists(src4):
                 self.ecode = 1
             else:
                 for filename in os.listdir(src4):
                     if os.path.isfile(src4 + "/" + filename):
-                        print(filename)
                         shutil.copy(src4 + "/" + filename,
-                                    home + "/.config/xfce4/" + filename)
+                                    home + "/.config/Thunar/" + filename)
 
             if not os.path.exists(src8):
                 self.ecode = 1
             else:
                 for filename in os.listdir(src8):
                     if os.path.isfile(src8 + "/" + filename):
-                        print(filename)
                         shutil.copy(src8 + "/" + filename, home + "/.config/autostart/" + filename
                                     )
 
