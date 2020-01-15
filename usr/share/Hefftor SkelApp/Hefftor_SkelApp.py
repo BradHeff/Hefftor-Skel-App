@@ -56,6 +56,14 @@ class HSApp(Gtk.Window):
             orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.add(self.vbox)
 
+        
+        # ===========================================
+        #				HELP Section
+        # ===========================================
+        self.btnhelp  = Gtk.Button(label="How to use SkelApp")
+        self.btnhelp.connect("clicked", self.on_help_clicked)
+        self.vbox.pack_start(self.btnhelp, True, True, 0)
+
         # ===========================================
         #				HEADER Section
         # ===========================================
@@ -88,17 +96,11 @@ class HSApp(Gtk.Window):
 
         # ListRow 1
         self.listRow1 = Gtk.ListBoxRow()
-        self.listRowmessage = Gtk.ListBoxRow()
         self.hbox1 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        self.hboxmessage = Gtk.Box(
-            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRow1.add(self.hbox1)
-        self.listRowmessage.add(self.hboxmessage)
 
         # ListRow 1 Elements
-        self.labelmessage = Gtk.Label(xalign=0)
-        self.labelmessage.set_markup("<span>Select a category from the dropdown menu and click <b>Run Skel</b> to\n update that specific config from <b>/etc/skel</b> to your home\n directory\n</span>")
         self.label1 = Gtk.Label(xalign=0)
         self.label1.set_markup("<b>Select Category</b>")
         self.cat = Gtk.ComboBoxText()
@@ -107,10 +109,8 @@ class HSApp(Gtk.Window):
         self.cat.set_active(0)
         self.cat.set_size_request(170, 0)
 
-        self.hboxmessage.pack_start(self.labelmessage, True, True, 0)
         self.hbox1.pack_start(self.label1, False, False, 0)
         self.hbox1.pack_end(self.cat, True, True, 0)
-        self.listview1.add(self.listRowmessage)
         self.listview1.add(self.listRow1)
 
         # ===========================================
@@ -238,6 +238,13 @@ class HSApp(Gtk.Window):
 #===========================================================================================================
 
     # ===========================================
+    #			HELP Section
+    # ===========================================
+    def on_help_clicked(self, widget):
+        Functions.callBox(self, "Select a category from the dropdown menu and click <b>Run Skel</b> to\n update that specific config from <b>/etc/skel</b> to your home\n directory", "How it works.")
+
+
+    # ===========================================
     #			DELETE BACKUP Section
     # ===========================================
     def on_delete_clicked(self, widget):
@@ -295,9 +302,15 @@ class HSApp(Gtk.Window):
         shutil.copy(
             home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
             now.strftime("%Y-%m-%d %H:%M:%S"))
+        shutil.copy(
+            home + '/.inputrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.inputrc-backup-" +
+            now.strftime("%Y-%m-%d %H:%M:%S"))
         
         GLib.idle_add(Functions.setMessage,self, "Done")
         shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
+        shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc-latest")
+        shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc")
+        shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc-latest")
         Functions.callBox(self, "bashrc upgraded", "Success!!")
         Functions.setMessage(self, "Idle...")
 
@@ -310,8 +323,8 @@ class HSApp(Gtk.Window):
         if self.firstrun == 0:
             Functions.setMessage(self, "Running Backup")
 
-        t1 = threading.Thread(target=self.processing,
-                              args=(self.cat.get_active_text(),))
+        t1 = threading.Thread(target=Functions.processing,
+                              args=(self, self.cat.get_active_text(),))
         t1.daemon = True
         t1.start()
 
@@ -320,56 +333,7 @@ class HSApp(Gtk.Window):
 #			                       FUNCTIONS Section
 # =========================================================================================================
     
-    # ===========================================
-    #		BACKUP BEFORE SKEL FUNCTION
-    # ===========================================
-    def processing(self, active_text):
-        now = datetime.datetime.now()
-        if self.firstrun == 0:
-            
-            GLib.idle_add(Functions.setProgress, self, 0.1)
-
-            #============================
-            #       CONFIG
-            #============================
-
-            Functions.copytree(self, home + '/.config', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.config_backup-' +
-                               now.strftime("%Y-%m-%d %H:%M:%S"))
-            GLib.idle_add(Functions.setProgress,self, 0.3)
-            
-            #============================
-            #       LOACAL
-            #============================
-
-            Functions.copytree(self, home + '/.local', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.local_backup-' +
-                               now.strftime("%Y-%m-%d %H:%M:%S"))
-            GLib.idle_add(Functions.setProgress, self,0.5)
-            
-            #============================
-            #       BASH
-            #============================
-            shutil.copy(
-                home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
-                now.strftime("%Y-%m-%d %H:%M:%S"))
-            
-            #============================
-            #       CONKY
-            #============================
-            Functions.copytree(self, home + '/.lua', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.lua_backup-' +
-                               now.strftime("%Y-%m-%d %H:%M:%S"))
-            shutil.copy(
-                home + '/.conkyrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.conkyrc-backup-" +
-                now.strftime("%Y-%m-%d %H:%M:%S"))
-            
-            self.firstrun = 1
-            GLib.idle_add(Functions.setMessage,self, "Done")
-
-        GLib.idle_add(Functions.setMessage,self, "Running Skel")
-        GLib.idle_add(Functions.setProgress,self, 0.8)
-        GLib.idle_add(self.run, active_text)
-        GLib.idle_add(self.refresh)
-        
-
+    
     # ===========================================
     #		SKEL FUNCTION
     # ===========================================
@@ -588,7 +552,7 @@ class HSApp(Gtk.Window):
 
     def resizeImage(self, x, y):
         pixbuf = self.pixbuf.scale_simple(x, y,
-                                        GdkPixbuf.InterpType.BILINEAR)
+                                        GdkPixbuf.InterpType.HYPER)
         self.image.set_from_pixbuf(pixbuf)
 
 
