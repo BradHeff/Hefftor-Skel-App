@@ -27,8 +27,8 @@ MENU_CATS = [
     "xfce-config package",
     "hlwm/bspwm configs package"
 ]
-
-bd = "/.SkelApp_Backups"
+BACKUPS_CATS = []
+bd = ".SkelApp_Backups"
 
 
 class HSApp(Gtk.Window):
@@ -96,7 +96,7 @@ class HSApp(Gtk.Window):
 
         # ListRow 1 Elements
         self.labelmessage = Gtk.Label(xalign=0)
-        self.labelmessage.set_markup("<span>Select a category from the dropdown menu and click\n <b>Run Skel</b> to update that specific config from <b>/etc/skel</b> to\n your home directory\n</span>")
+        self.labelmessage.set_markup("<span>Select a category from the dropdown menu and click <b>Run Skel</b> to\n update that specific config from <b>/etc/skel</b> to your home\n directory\n</span>")
         self.label1 = Gtk.Label(xalign=0)
         self.label1.set_text("Category     ")
         self.cat = Gtk.ComboBoxText()
@@ -120,41 +120,38 @@ class HSApp(Gtk.Window):
 
         # ListRow 1
         self.listRow4 = Gtk.ListBoxRow()
-        self.listRow5 = Gtk.ListBoxRow()
         self.listRow9 = Gtk.ListBoxRow()
         self.hbox4 = Gtk.Box(
-            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        self.hbox5 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.hbox9 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRow4.add(self.hbox4)
-        self.listRow5.add(self.hbox5)
         self.listRow9.add(self.hbox9)
 
         # ListRow 1 Elements
-        self.btn4  = Gtk.Button(label="Clean .config")
-        self.btn5  = Gtk.Button(label="Clean .local ")
-        self.btn6  = Gtk.Button(label="Clean .bashrc")
-        self.btn10 = Gtk.Button(label="Clean conky  ")
+        self.label1 = Gtk.Label(xalign=0)
+        self.label1.set_text("Backups     ")
+        self.backs = Gtk.ComboBoxText()
+        self.refresh()
+        self.backs.set_active(0)
+        self.backs.set_size_request(170, 0)
+        self.btn4  = Gtk.Button(label="Refresh")
+        self.btn5  = Gtk.Button(label="Delete")
         self.btn9  = Gtk.Button(label="Clean All Backups")
 
-        self.btn4.connect("clicked", self.on_config_clicked)
-        self.btn5.connect("clicked", self.on_local_clicked)
-        self.btn6.connect("clicked", self.on_bash_clicked)
-        self.btn10.connect("clicked", self.on_conky_clicked)
+        self.btn4.connect("clicked", self.on_refresh_clicked)
+        self.btn5.connect("clicked", self.on_delete_clicked)
         self.btn9.connect("clicked", self.on_flush_clicked)
 
         self.label4 = Gtk.Label(xalign=0)
-        self.label4.set_text("Delete Backup Configs")
-        self.hbox5.pack_start(self.label4, True, False, 0)
+        self.label4.set_text("Delete Backups")
+        
+        self.hbox4.pack_start(self.label4, True, False, 0)
+        self.hbox4.pack_start(self.backs, True, True, 0)
         self.hbox4.pack_start(self.btn4, False, False, 0)
-        self.hbox4.pack_start(self.btn5, False, False, 0)
-        self.hbox4.pack_start(self.btn6, False, False, 0)
-        self.hbox9.pack_end(self.btn9, True, True, 0)
-        self.hbox9.pack_start(self.btn10, False, False, 0)
-
-        self.listview4.add(self.listRow5)
+        self.hbox9.pack_end(self.btn5, True, True, 0)
+        self.hbox9.pack_start(self.btn9, True, True, 0)
+        
         self.listview4.add(self.listRow4)
         self.listview4.add(self.listRow9)
 
@@ -224,33 +221,28 @@ class HSApp(Gtk.Window):
         self.listview3.add(self.listRow3)
 
 
-    def on_config_clicked(self, widget):
+    def on_delete_clicked(self, widget):
         for filename in os.listdir(home + "/" + bd):
-            if filename.startswith(".config_backup"):
+            if filename == self.backs.get_active_text():
                 shutil.rmtree(home + "/" + bd + "/" + filename)
+        self.refresh()
         self.callBox("Config backups cleaned.", "Success!!")
 
-    def on_local_clicked(self, widget):
+    def refresh(self):
+        self.backs.get_model().clear()
+        BACKUPS_CATS = []
         for filename in os.listdir(home + "/" + bd):
-            if filename.startswith(".local_backup"):
-                shutil.rmtree(home + "/" + bd + "/" + filename)
-        self.callBox("local backups cleaned.", "Success!!")
+            if os.path.isdir(home + "/" + bd + "/" + filename):
+                BACKUPS_CATS.append(filename)
+        print(BACKUPS_CATS)
+        for item in BACKUPS_CATS:
+            self.backs.append_text(item)
 
-    def on_bash_clicked(self, widget):
+        self.backs.set_active(0)
 
-        for filename in os.listdir(home + "/" + bd):
-            if filename.startswith(".bashrc-backup"):
-                os.unlink(home + "/" + bd + "/" + filename)
-        self.callBox("bashrc backups cleaned.", "Success!!")
-
-    def on_conky_clicked(self, widget):
-        for filename in os.listdir(home + "/" + bd):
-            if filename.startswith(".conkyrc-backup"):
-                os.unlink(home + "/" + bd + "/" + filename)
-        for filename in os.listdir(home + "/" + bd):
-            if filename.startswith(".lua_backup"):
-                shutil.rmtree(home + "/" + bd + "/" + filename)
-        self.callBox("conky backups cleaned.", "Success!!")
+    def on_refresh_clicked(self, widget):
+        self.refresh()
+        
 
     def on_flush_clicked(self, widget):
         print("FLUSH!")
@@ -262,15 +254,18 @@ class HSApp(Gtk.Window):
         for filename in os.listdir(home + "/" + bd):
             if os.path.isfile(home + "/" + bd + "/" + filename):
                 os.unlink(home + "/" + bd + "/" + filename)
-        
+        self.refresh()
         self.callBox(".SkelApp_Backups directory has been cleaned.", "Success!!")
 
     def on_bashrc_skel_clicked(self, widget):
         
         now = datetime.datetime.now()
         self.setMessage("Running Backup")
+        if not os.path.exists(home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H")):
+            os.makedirs(home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H"))
+            
         shutil.copy(
-            home + '/.bashrc', home + "/" + bd + "/.bashrc-backup-" +
+            home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
             now.strftime("%Y-%m-%d %H:%M:%S"))
         
         GLib.idle_add(self.setMessage, "Done")
@@ -316,7 +311,7 @@ class HSApp(Gtk.Window):
             #       CONFIG
             #============================
 
-            Functions.copytree(self, home + '/.config', home + '/' + bd + '/.config_backup-' +
+            Functions.copytree(self, home + '/.config', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.config_backup-' +
                                now.strftime("%Y-%m-%d %H:%M:%S"))
             GLib.idle_add(self.setProgress, 0.3)
             
@@ -324,7 +319,7 @@ class HSApp(Gtk.Window):
             #       LOACAL
             #============================
 
-            Functions.copytree(self, home + '/.local', home + '/' + bd + '/.local_backup-' +
+            Functions.copytree(self, home + '/.local', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.local_backup-' +
                                now.strftime("%Y-%m-%d %H:%M:%S"))
             GLib.idle_add(self.setProgress, 0.5)
             
@@ -332,16 +327,16 @@ class HSApp(Gtk.Window):
             #       BASH
             #============================
             shutil.copy(
-                home + '/.bashrc', home + "/" + bd + "/.bashrc-backup-" +
+                home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
                 now.strftime("%Y-%m-%d %H:%M:%S"))
             
             #============================
             #       CONKY
             #============================
-            Functions.copytree(self, home + '/.lua', home + '/' + bd + '/.lua_backup-' +
+            Functions.copytree(self, home + '/.lua', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.lua_backup-' +
                                now.strftime("%Y-%m-%d %H:%M:%S"))
             shutil.copy(
-                home + '/.conkyrc', home + "/" + bd + "/.conkyrc-backup-" +
+                home + '/.conkyrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.conkyrc-backup-" +
                 now.strftime("%Y-%m-%d %H:%M:%S"))
             
             self.firstrun = 1
