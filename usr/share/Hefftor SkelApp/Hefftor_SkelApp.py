@@ -21,6 +21,7 @@ MENU_CATS = [
     "herbstluftwm Configs",
     "bspwm Configs",
     "root Configs",
+    "betterlockscreen cache",
     "Local Configs",
     "Conky Configs",
     "dconf Configs",
@@ -416,6 +417,18 @@ class HSApp(Gtk.Window):
                 Functions.copytree(self, src, home + '/.config/bspwm/'
                                    )
                 print("Path copied")
+
+        # ===========================================
+        #		Betterlockscreen
+        # ===========================================
+        elif cat == "betterlockscreen cache":
+            self.ecode = 0
+            src1 = '/etc/skel/.cache/i3lock'
+
+            if not os.path.exists(src1):
+                self.ecode = 1
+            else:
+                Functions.copytree(self, src1, home + '/.cache/i3lock')
 
         # ===========================================
         #		ROOT
