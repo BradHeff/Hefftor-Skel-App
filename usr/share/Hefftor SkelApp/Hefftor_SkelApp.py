@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import Functions
+import Help
 
 import threading
 import datetime
@@ -241,7 +242,10 @@ class HSApp(Gtk.Window):
     #			HELP Section
     # ===========================================
     def on_help_clicked(self, widget):
-        Functions.callBox(self, "Select a category from the dropdown menu and click <b>Run Skel</b> to\n update that specific config from <b>/etc/skel</b> to your home\n directory", "How it works.")
+        w = Help.Help()
+        w.show_all()
+
+        #Functions.callBox(self, "Select a category from the dropdown menu and click <b>Run Skel</b> to\n update that specific config from <b>/etc/skel</b> to your home\n directory", "How it works.")
 
 
     # ===========================================
