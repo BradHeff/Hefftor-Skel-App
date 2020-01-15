@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 import Functions
-from Functions import *
 
 import threading
 import datetime
-# from os.path import expanduser
-# import shutil
 import signal
 from gi.repository import Gtk, GdkPixbuf, GLib
 import gi
-# import os
+from os.path import expanduser
+import os
+import shutil
+
+
 gi.require_version('Gtk', '3.0')
 
 
-# home = expanduser("~")
+home = expanduser("~")
 base_dir = os.path.dirname(os.path.realpath(__file__))
 MENU_CATS = [
     "polybar Configs",
@@ -243,7 +244,7 @@ class HSApp(Gtk.Window):
             if filename == self.backs.get_active_text():
                 shutil.rmtree(home + "/" + bd + "/" + filename)
         self.refresh()
-        self.callBox("Config backups cleaned.", "Success!!")
+        Functions.callBox(self, "Config backups cleaned.", "Success!!")
 
     # ===========================================
     #			REFRESH BACKUP Section
@@ -278,7 +279,7 @@ class HSApp(Gtk.Window):
             if os.path.isfile(home + "/" + bd + "/" + filename):
                 os.unlink(home + "/" + bd + "/" + filename)
         self.refresh()
-        self.callBox(".SkelApp_Backups directory has been cleaned.", "Success!!")
+        Functions.callBox(self, ".SkelApp_Backups directory has been cleaned.", "Success!!")
 
     # ===========================================
     #			UPGRADE BASHRC Section
@@ -286,7 +287,7 @@ class HSApp(Gtk.Window):
     def on_bashrc_skel_clicked(self, widget):
         
         now = datetime.datetime.now()
-        self.setMessage("Running Backup")
+        Functions.setMessage(self, "Running Backup")
         if not os.path.exists(home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H")):
             os.makedirs(home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H"))
             
@@ -294,10 +295,10 @@ class HSApp(Gtk.Window):
             home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
             now.strftime("%Y-%m-%d %H:%M:%S"))
         
-        GLib.idle_add(self.setMessage, "Done")
+        GLib.idle_add(Functions.setMessage,self, "Done")
         shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
-        self.callBox("bashrc upgraded", "Success!!")
-        self.setMessage("Idle...")
+        Functions.callBox(self, "bashrc upgraded", "Success!!")
+        Functions.setMessage(self, "Idle...")
 
     # ===========================================
     #			RUN SKEL Section
@@ -306,7 +307,7 @@ class HSApp(Gtk.Window):
 
         self.btn2.set_sensitive(False)
         if self.firstrun == 0:
-            self.setMessage("Running Backup")
+            Functions.setMessage(self, "Running Backup")
 
         t1 = threading.Thread(target=self.processing,
                               args=(self.cat.get_active_text(),))
@@ -318,23 +319,6 @@ class HSApp(Gtk.Window):
 #			                       FUNCTIONS Section
 # =========================================================================================================
     
-    def setProgress(self, value):
-        self.progressbar.set_fraction(value)
-
-    def resizeImage(self, x, y):
-        pixbuf = self.pixbuf.scale_simple(x, y,
-                                          GdkPixbuf.InterpType.BILINEAR)
-        self.image.set_from_pixbuf(pixbuf)
-
-    def on_check_resize(self, window):
-        boxAllocation = self.hboxHDR.get_allocation()
-        self.image_area.set_allocation(boxAllocation)
-        self.resizeImage(boxAllocation.width,
-                         boxAllocation.height)
-
-    def setMessage(self, message):
-        self.label4.set_text(message)
-    
     # ===========================================
     #		BACKUP BEFORE SKEL FUNCTION
     # ===========================================
@@ -342,7 +326,7 @@ class HSApp(Gtk.Window):
         now = datetime.datetime.now()
         if self.firstrun == 0:
             
-            GLib.idle_add(self.setProgress, 0.1)
+            GLib.idle_add(Functions.setProgress, self, 0.1)
 
             #============================
             #       CONFIG
@@ -350,7 +334,7 @@ class HSApp(Gtk.Window):
 
             Functions.copytree(self, home + '/.config', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.config_backup-' +
                                now.strftime("%Y-%m-%d %H:%M:%S"))
-            GLib.idle_add(self.setProgress, 0.3)
+            GLib.idle_add(Functions.setProgress,self, 0.3)
             
             #============================
             #       LOACAL
@@ -358,7 +342,7 @@ class HSApp(Gtk.Window):
 
             Functions.copytree(self, home + '/.local', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.local_backup-' +
                                now.strftime("%Y-%m-%d %H:%M:%S"))
-            GLib.idle_add(self.setProgress, 0.5)
+            GLib.idle_add(Functions.setProgress, self,0.5)
             
             #============================
             #       BASH
@@ -377,27 +361,13 @@ class HSApp(Gtk.Window):
                 now.strftime("%Y-%m-%d %H:%M:%S"))
             
             self.firstrun = 1
-            GLib.idle_add(self.setMessage, "Done")
+            GLib.idle_add(Functions.setMessage,self, "Done")
 
-        GLib.idle_add(self.setMessage, "Running Skel")
-        GLib.idle_add(self.setProgress, 0.8)
+        GLib.idle_add(Functions.setMessage,self, "Running Skel")
+        GLib.idle_add(Functions.setProgress,self, 0.8)
         GLib.idle_add(self.run, active_text)
         GLib.idle_add(self.refresh)
         
-
-    # ===========================================
-    #		MESSAGEBOX FUNCTION
-    # ===========================================
-    def callBox(self, message, title):
-        message = message
-        title = title
-
-        md = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.INFO,
-                               buttons=Gtk.ButtonsType.OK, text=title)
-        md.format_secondary_text(message)
-        md.run()
-        md.destroy()
-        # self.set_sensitive(True)
 
     # ===========================================
     #		SKEL FUNCTION
@@ -591,17 +561,29 @@ class HSApp(Gtk.Window):
 
                 print("hlwm-config copied")
 
-        self.setProgress(1)
+        Functions.setProgress(self,1)
         print("ErrorCode: ",self.ecode)
         if(self.ecode == 1):
-            self.callBox("Cant seem to find that source. Have you got it installed?", "Success!!")
+            Functions.callBox(self, "Cant seem to find that source. Have you got it installed?", "Success!!")
         else:
-            self.callBox("Skel executed successfully.", "Success!!")
+            Functions.callBox(self, "Skel executed successfully.", "Success!!")
 
-        self.setProgress(0)
+        Functions.setProgress(self,0)
         self.btn2.set_sensitive(True)
-        self.setMessage("Idle...")
+        Functions.setMessage(self, "Idle...")
 
+
+    def resizeImage(self, x, y):
+        pixbuf = self.pixbuf.scale_simple(x, y,
+                                        GdkPixbuf.InterpType.BILINEAR)
+        self.image.set_from_pixbuf(pixbuf)
+
+
+    def on_check_resize(self, window):
+        boxAllocation = self.hboxHDR.get_allocation()
+        self.image_area.set_allocation(boxAllocation)
+        self.resizeImage(boxAllocation.width,
+                        boxAllocation.height)
 #============================================================================================================
 
 
