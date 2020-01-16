@@ -262,6 +262,9 @@ class HSApp(Gtk.Window):
     #			REFRESH BACKUP Section
     # ===========================================
     def refresh(self):
+        if not os.path.exists(home + "/" + bd):
+            os.makedirs(home + "/" + bd)
+            
         self.backs.get_model().clear()
         BACKUPS_CATS = []
         for filename in os.listdir(home + "/" + bd):
