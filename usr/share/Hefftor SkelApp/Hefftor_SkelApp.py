@@ -42,7 +42,8 @@ class HSApp(Gtk.Window):
         Gtk.Window.__init__(self, title="Hefftor SkelAp")
         # self.set_resizable(False)
         self.set_border_width(10)
-        self.set_icon_from_file(os.path.join(base_dir, 'hefftorlinux.svg'))
+        self.set_icon_from_file(os.path.join(
+            base_dir, 'images/hefftorlinux.svg'))
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect("delete-event", Gtk.main_quit)
         self.connect("check_resize", self.on_check_resize)
@@ -80,7 +81,7 @@ class HSApp(Gtk.Window):
         self.listRowHDR.add(self.hboxHDR)
 
         self.pixbuf = GdkPixbuf.Pixbuf().new_from_file_at_size(
-            os.path.join(base_dir, 'logo.png'), 300, 50)
+            os.path.join(base_dir, 'images/logo.png'), 300, 50)
         self.image = Gtk.Image().new_from_pixbuf(self.pixbuf)
         self.image_area = Gtk.Box()
         self.image_area.add(self.image)

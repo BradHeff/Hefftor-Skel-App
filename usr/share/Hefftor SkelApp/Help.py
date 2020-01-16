@@ -12,7 +12,8 @@ class Help(Gtk.Window):
         self.set_border_width(10)
         self.set_size_request(580, 600)
         # self.set_resizable(False)
-        self.set_icon_from_file(os.path.join(base_dir, 'hefftorlinux.svg'))
+        self.set_icon_from_file(os.path.join(
+            base_dir, 'images/hefftorlinux.svg'))
         self.set_position(Gtk.WindowPosition.NONE)
 
         self.connect("check_resize", self.on_check_resize)
@@ -42,7 +43,7 @@ class Help(Gtk.Window):
         self.listRowHDRH.add(self.hboxHDRH)
 
         self.pixbufH = GdkPixbuf.Pixbuf().new_from_file(
-            os.path.join(base_dir, 'logo_help.png'))
+            os.path.join(base_dir, 'images/logo_help.png'))
         self.image = Gtk.Image().new_from_pixbuf(self.pixbufH)
         self.image_areaH = Gtk.Box()
         self.image_areaH.add(self.image)

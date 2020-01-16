@@ -102,13 +102,13 @@ def copytree(self, src, dst, symlinks=False, ignore=None):
             except Exception as e:
                 print(e)
                 print("ERROR2")
-                ecode = 1
+                self.ecode = 1
         else:
             try:
                 shutil.copy2(s, d)
             except:
                 print("ERROR3")
-                ecode = 1
+                self.ecode = 1
 
 # ===========================================
 #		BACKUP BEFORE SKEL FUNCTION
