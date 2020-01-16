@@ -293,11 +293,12 @@ class HSApp(Gtk.Window):
             home + '/.inputrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.inputrc-backup-" +
             now.strftime("%Y-%m-%d %H:%M:%S"))
 
-        GLib.idle_add(Functions.setMessage, self, "Done")
+        Functions.setMessage(self, "Upgrading Bashrc")
         shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
         shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc-latest")
         shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc")
         shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc-latest")
+        Functions.setMessage(self, "Bashrc Done")
         Functions.callBox(self, "bashrc upgraded", "Success!!")
         Functions.setMessage(self, "Idle...")
         Functions.refresh(self)

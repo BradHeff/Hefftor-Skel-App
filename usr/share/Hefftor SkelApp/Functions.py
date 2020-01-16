@@ -1,9 +1,9 @@
 import Hefftor_SkelApp
-from Hefftor_SkelApp import *
+from Hefftor_SkelApp import os,home,bd,datetime,GLib,shutil,Gtk
 
 
 def setMessage(self, message):
-    self.label4.set_text(message)
+    self.label4.set_markup("<i>" + message + "</i>")
 
 
 def setProgress(self, value):
@@ -20,7 +20,7 @@ def Delete_Backup(self):
             shutil.rmtree(home + "/" + bd + "/" + filename)
     GLib.idle_add(refresh, self)
     GLib.idle_add(setProgress, self, 1)
-    GLib.idle_add(Functions.callBox,self, "Config backups cleaned.", "Success!!")
+    GLib.idle_add(callBox,self, "Config backups cleaned.", "Success!!")
     GLib.idle_add(self.button_toggles, True)
     GLib.idle_add(setProgress, self, 0)
 
@@ -32,7 +32,7 @@ def Flush_All(self):
 
     if count > 0:
         count = ((count/count)/count)
-
+        GLib.idle_add(setMessage,self, "Deleting Backup")
         for filename in os.listdir(home + "/" + bd):                
             if os.path.isdir(home + "/" + bd + "/" + filename):
                 GLib.idle_add(setProgress, self, self.progressbar.get_fraction() + count)
@@ -43,6 +43,7 @@ def Flush_All(self):
         GLib.idle_add(callBox,self, ".SkelApp_Backups directory has been cleaned.", "Success!!")
         GLib.idle_add(setProgress, self, 0)
     GLib.idle_add(self.button_toggles, True)
+    GLib.idle_add(setMessage,self, "Idle...")
 
 # ===========================================
 #		REFRESH FUNCTION
