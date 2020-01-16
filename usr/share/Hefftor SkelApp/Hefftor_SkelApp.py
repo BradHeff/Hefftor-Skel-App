@@ -38,7 +38,7 @@ class HSApp(Gtk.Window):
     def __init__(self):
         super(HSApp, self).__init__()
         Gtk.Window.__init__(self, title="Hefftor SkelAp")
-        self.set_resizable(False)
+        # self.set_resizable(False)
         self.set_border_width(10)
         self.set_icon_from_file(os.path.join(base_dir, 'hefftorlinux.svg'))
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -78,8 +78,7 @@ class HSApp(Gtk.Window):
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRowHDR.add(self.hboxHDR)
 
-        self.pixbuf = GdkPixbuf.Pixbuf().new_from_file(
-            os.path.join(base_dir, 'logo.png'))
+        self.pixbuf = GdkPixbuf.Pixbuf().new_from_file_at_size(os.path.join(base_dir, 'logo.png'),300, 50)
         self.image = Gtk.Image().new_from_pixbuf(self.pixbuf)
         self.image_area = Gtk.Box()
         self.image_area.add(self.image)
@@ -137,7 +136,7 @@ class HSApp(Gtk.Window):
 
         # ListRow 1 Elements
         self.backs = Gtk.ComboBoxText()
-        self.refresh()
+        Functions.refresh(self)
         self.backs.set_active(0)
         self.backs.set_size_request(170, 0)
         self.btn4  = Gtk.Button(label="Refresh")
@@ -255,29 +254,15 @@ class HSApp(Gtk.Window):
         for filename in os.listdir(home + "/" + bd):
             if filename == self.backs.get_active_text():
                 shutil.rmtree(home + "/" + bd + "/" + filename)
-        self.refresh()
+        Functions.refresh(self)
         Functions.callBox(self, "Config backups cleaned.", "Success!!")
 
     # ===========================================
     #			REFRESH BACKUP Section
     # ===========================================
-    def refresh(self):
-        if not os.path.exists(home + "/" + bd):
-            os.makedirs(home + "/" + bd)
-            
-        self.backs.get_model().clear()
-        BACKUPS_CATS = []
-        for filename in os.listdir(home + "/" + bd):
-            if os.path.isdir(home + "/" + bd + "/" + filename):
-                BACKUPS_CATS.append(filename)
-        print(BACKUPS_CATS)
-        for item in BACKUPS_CATS:
-            self.backs.append_text(item)
-
-        self.backs.set_active(0)
-
+    
     def on_refresh_clicked(self, widget):
-        self.refresh()
+        Functions.refresh(self)
         
 
     # ===========================================
@@ -293,7 +278,7 @@ class HSApp(Gtk.Window):
         for filename in os.listdir(home + "/" + bd):
             if os.path.isfile(home + "/" + bd + "/" + filename):
                 os.unlink(home + "/" + bd + "/" + filename)
-        self.refresh()
+        Functions.refresh(self)
         Functions.callBox(self, ".SkelApp_Backups directory has been cleaned.", "Success!!")
 
     # ===========================================
@@ -320,6 +305,7 @@ class HSApp(Gtk.Window):
         shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc-latest")
         Functions.callBox(self, "bashrc upgraded", "Success!!")
         Functions.setMessage(self, "Idle...")
+        Functions.refresh(self)
 
     # ===========================================
     #			RUN SKEL Section
@@ -561,7 +547,6 @@ class HSApp(Gtk.Window):
         pixbuf = self.pixbuf.scale_simple(x, y,
                                         GdkPixbuf.InterpType.HYPER)
         self.image.set_from_pixbuf(pixbuf)
-
 
     def on_check_resize(self, window):
         boxAllocation = self.hboxHDR.get_allocation()

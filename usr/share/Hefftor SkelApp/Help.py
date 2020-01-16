@@ -10,8 +10,8 @@ class Help(Gtk.Window):
         super(Help, self).__init__()
         sw = Gtk.ScrolledWindow()
         self.set_border_width(10)
-        self.set_size_request(580, 400)
-        self.set_resizable(False)
+        self.set_size_request(580, 600)
+        # self.set_resizable(False)
         self.set_icon_from_file(os.path.join(base_dir, 'hefftorlinux.svg'))
         self.set_position(Gtk.WindowPosition.NONE)
 

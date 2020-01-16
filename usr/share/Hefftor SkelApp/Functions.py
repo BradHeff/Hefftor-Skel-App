@@ -9,6 +9,22 @@ def setMessage(self, message):
 def setProgress(self, value):
     self.progressbar.set_fraction(value)
 
+
+def refresh(self):
+    if not os.path.exists(home + "/" + bd):
+        os.makedirs(home + "/" + bd)
+
+    self.backs.get_model().clear()
+    BACKUPS_CATS = []
+    for filename in os.listdir(home + "/" + bd):
+        if os.path.isdir(home + "/" + bd + "/" + filename):
+            BACKUPS_CATS.append(filename)
+    print(BACKUPS_CATS)
+    for item in BACKUPS_CATS:
+        self.backs.append_text(item)
+
+    self.backs.set_active(0)
+
 # ===========================================
 #		MESSAGEBOX FUNCTION
 # ===========================================
