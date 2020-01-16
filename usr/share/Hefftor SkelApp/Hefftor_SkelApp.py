@@ -250,11 +250,10 @@ class HSApp(Gtk.Window):
     # ===========================================
 
     def on_delete_clicked(self, widget):
-        for filename in os.listdir(home + "/" + bd):
-            if filename == self.backs.get_active_text():
-                shutil.rmtree(home + "/" + bd + "/" + filename)
-        Functions.refresh(self)
-        Functions.callBox(self, "Config backups cleaned.", "Success!!")
+        self.button_toggles(False)
+        t1 = threading.Thread(target=Functions.Delete_Backup, args=(self,))
+        t1.daemon = True
+        t1.start()
 
     # ===========================================
     #			REFRESH BACKUP Section
@@ -268,6 +267,7 @@ class HSApp(Gtk.Window):
     # ===========================================
 
     def on_flush_clicked(self, widget):
+        self.button_toggles(False)
         t1 = threading.Thread(target=Functions.Flush_All, args=(self,))
         t1.daemon = True
         t1.start()
@@ -276,7 +276,7 @@ class HSApp(Gtk.Window):
     #			UPGRADE BASHRC Section
     # ===========================================
     def on_bashrc_skel_clicked(self, widget):
-
+        self.button_toggles(False)
         now = datetime.datetime.now()
         Functions.setMessage(self, "Running Backup")
         if not os.path.exists(home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H")):
@@ -298,13 +298,14 @@ class HSApp(Gtk.Window):
         Functions.callBox(self, "bashrc upgraded", "Success!!")
         Functions.setMessage(self, "Idle...")
         Functions.refresh(self)
+        self.button_toggles(True)
 
     # ===========================================
     #			RUN SKEL Section
     # ===========================================
     def on_button_fetch_clicked(self, widget):
 
-        self.btn2.set_sensitive(False)
+        self.button_toggles(False)
         if self.firstrun == 0:
             Functions.setMessage(self, "Running Backup")
 
@@ -313,11 +314,16 @@ class HSApp(Gtk.Window):
         t1.daemon = True
         t1.start()
 
+    def button_toggles(self, state):
+        self.btn2.set_sensitive(state)
+        self.btn7.set_sensitive(state)
+        self.btn5.set_sensitive(state)
+        self.btn9.set_sensitive(state)
+        self.btn4.set_sensitive(state)
 
 # =========================================================================================================
 #			                       FUNCTIONS Section
 # =========================================================================================================
-
 
     def resizeImage(self, x, y):
         pixbuf = self.pixbuf.scale_simple(x, y,

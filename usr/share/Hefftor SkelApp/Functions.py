@@ -9,6 +9,19 @@ def setMessage(self, message):
 def setProgress(self, value):
     self.progressbar.set_fraction(value)
 
+
+# ===========================================
+#		DELETE BACKUP FUNCTION
+# ===========================================
+def Delete_Backup(self):
+    
+    for filename in os.listdir(home + "/" + bd):
+        if filename == self.backs.get_active_text():
+            shutil.rmtree(home + "/" + bd + "/" + filename)
+    GLib.idle_add(refresh, self)
+    GLib.idle_add(Functions.callBox,self, "Config backups cleaned.", "Success!!")
+    GLib.idle_add(self.button_toggles, True)
+
 # ===========================================
 #		FLUSH ALL FUNCTION
 # ===========================================
@@ -25,6 +38,7 @@ def Flush_All(self):
     GLib.idle_add(refresh, self)
     GLib.idle_add(callBox,self, ".SkelApp_Backups directory has been cleaned.", "Success!!")
     GLib.idle_add(setProgress, self, 0)
+    GLib.idle_add(self.button_toggles, True)
 
 # ===========================================
 #		REFRESH FUNCTION
@@ -154,7 +168,6 @@ def run(self, cat):
     # ===========================================
     if cat == "polybar Configs":
         self.ecode = 0
-        print(self.ecode)
         src = '/etc/skel/.config/polybar/'
         if not os.path.exists(src):
             self.ecode = 1
@@ -349,12 +362,11 @@ def run(self, cat):
             print("hlwm-config copied")
 
     setProgress(self,1)
-    print("ErrorCode: ",self.ecode)
     if(self.ecode == 1):
         callBox(self, "Cant seem to find that source. Have you got it installed?", "Success!!")
     else:
         callBox(self, "Skel executed successfully.", "Success!!")
 
     setProgress(self,0)
-    self.btn2.set_sensitive(True)
+    self.button_toggles(True)
     setMessage(self, "Idle...")
