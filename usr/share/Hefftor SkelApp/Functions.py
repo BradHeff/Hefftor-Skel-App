@@ -14,30 +14,34 @@ def setProgress(self, value):
 #		DELETE BACKUP FUNCTION
 # ===========================================
 def Delete_Backup(self):
-    
+    GLib.idle_add(setProgress, self, 0.3)
     for filename in os.listdir(home + "/" + bd):
         if filename == self.backs.get_active_text():
             shutil.rmtree(home + "/" + bd + "/" + filename)
     GLib.idle_add(refresh, self)
+    GLib.idle_add(setProgress, self, 1)
     GLib.idle_add(Functions.callBox,self, "Config backups cleaned.", "Success!!")
     GLib.idle_add(self.button_toggles, True)
+    GLib.idle_add(setProgress, self, 0)
 
 # ===========================================
 #		FLUSH ALL FUNCTION
 # ===========================================
 def Flush_All(self):
     count = os.listdir(home + "/" + bd).__len__()
-    count = ((count/count)/count)
 
-    for filename in os.listdir(home + "/" + bd):                
-        if os.path.isdir(home + "/" + bd + "/" + filename):
-            GLib.idle_add(setProgress, self, self.progressbar.get_fraction() + count)
-            shutil.rmtree(home + "/" + bd + "/" + filename)            
-            
+    if count > 0:
+        count = ((count/count)/count)
 
-    GLib.idle_add(refresh, self)
-    GLib.idle_add(callBox,self, ".SkelApp_Backups directory has been cleaned.", "Success!!")
-    GLib.idle_add(setProgress, self, 0)
+        for filename in os.listdir(home + "/" + bd):                
+            if os.path.isdir(home + "/" + bd + "/" + filename):
+                GLib.idle_add(setProgress, self, self.progressbar.get_fraction() + count)
+                shutil.rmtree(home + "/" + bd + "/" + filename)            
+                
+
+        GLib.idle_add(refresh, self)
+        GLib.idle_add(callBox,self, ".SkelApp_Backups directory has been cleaned.", "Success!!")
+        GLib.idle_add(setProgress, self, 0)
     GLib.idle_add(self.button_toggles, True)
 
 # ===========================================
@@ -251,7 +255,7 @@ def run(self, cat):
             
             for filename in os.listdir(src2):
                 if os.path.exists(src2 + "/" + filename) and filename != "xfce4":
-                    print(filename)
+                    # print(filename)
                     copytree(self, src2 + "/" + filename, home + '/.local/share/' + filename)
 
         print(".local copied")
@@ -284,6 +288,39 @@ def run(self, cat):
                                 )
 
         print(".local copied")
+
+    # ===========================================
+    #		ROFI
+    # ===========================================
+    elif cat == "rofi Configs":
+        self.ecode = 0
+        src1 = '/etc/skel/.config/rofi'
+        if not os.path.exists(src1):
+            self.ecode = 1
+        else:
+            copytree(self, src1, home + '/.config/rofi'
+                                )
+
+        print("rofi copied")
+
+    # ===========================================
+    #		VARIETY
+    # ===========================================
+    elif cat == "Variety Configs":
+        self.ecode = 0
+        src1 = '/etc/skel/.config/variety'
+        if not os.path.exists(src1):
+            self.ecode = 1
+        else:
+            for folder in os.listdir(src1):
+                if os.path.isdir(src1 + "/" + folder):
+                    copytree(
+                        self, src1 + "/" + folder, home + '/.config/variety/' + folder)
+                elif os.path.isfile(src1 + "/" + folder):
+                    shutil.copy(src1 + "/" + folder,
+                                home + "/.config/variety/" + folder)
+
+        print("variety copied")
 
     # ===========================================
     #		XFCE

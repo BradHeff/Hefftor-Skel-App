@@ -26,6 +26,8 @@ MENU_CATS = [
     "Local Configs",
     "Conky Configs",
     "dconf Configs",
+    "Variety Configs",
+    "rofi Configs",
     "xfce Configs",
     "xfce-config package",
     "hlwm/bspwm configs package"
