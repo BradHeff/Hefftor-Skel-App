@@ -57,11 +57,10 @@ class HSApp(Gtk.Window):
             orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.add(self.vbox)
 
-        
         # ===========================================
         #				HELP Section
         # ===========================================
-        self.btnhelp  = Gtk.Button(label="How to use SkelApp")
+        self.btnhelp = Gtk.Button(label="How to use SkelApp")
         self.btnhelp.connect("clicked", self.on_help_clicked)
         self.vbox.pack_start(self.btnhelp, True, True, 0)
 
@@ -78,7 +77,8 @@ class HSApp(Gtk.Window):
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRowHDR.add(self.hboxHDR)
 
-        self.pixbuf = GdkPixbuf.Pixbuf().new_from_file_at_size(os.path.join(base_dir, 'logo.png'),300, 50)
+        self.pixbuf = GdkPixbuf.Pixbuf().new_from_file_at_size(
+            os.path.join(base_dir, 'logo.png'), 300, 50)
         self.image = Gtk.Image().new_from_pixbuf(self.pixbuf)
         self.image_area = Gtk.Box()
         self.image_area.add(self.image)
@@ -139,9 +139,9 @@ class HSApp(Gtk.Window):
         Functions.refresh(self)
         self.backs.set_active(0)
         self.backs.set_size_request(170, 0)
-        self.btn4  = Gtk.Button(label="Refresh")
-        self.btn5  = Gtk.Button(label="Delete")
-        self.btn9  = Gtk.Button(label="Clean All Backups")
+        self.btn4 = Gtk.Button(label="Refresh")
+        self.btn5 = Gtk.Button(label="Delete")
+        self.btn9 = Gtk.Button(label="Clean All Backups")
 
         self.btn4.connect("clicked", self.on_refresh_clicked)
         self.btn5.connect("clicked", self.on_delete_clicked)
@@ -149,13 +149,13 @@ class HSApp(Gtk.Window):
 
         self.label4 = Gtk.Label(xalign=0)
         self.label4.set_markup("<b>Delete Backups</b>")
-        
+
         self.hbox5.pack_start(self.label4, True, True, 0)
         self.hbox4.pack_start(self.backs, True, True, 0)
         self.hbox4.pack_start(self.btn4, False, False, 0)
         self.hbox4.pack_end(self.btn5, True, True, 0)
         self.hbox9.pack_start(self.btn9, True, True, 0)
-        
+
         self.listview4.add(self.listRow5)
         self.listview4.add(self.listRow4)
         self.listview4.add(self.listRow9)
@@ -214,7 +214,6 @@ class HSApp(Gtk.Window):
         self.progressbar = Gtk.ProgressBar()
         self.vbox.pack_start(self.progressbar, True, True, 0)
 
-
         # ===========================================
         #				FOOTER Section
         # ===========================================
@@ -235,7 +234,7 @@ class HSApp(Gtk.Window):
         self.hbox3.pack_start(self.label3, True, False, 0)
         self.listview3.add(self.listRow3)
 
-#===========================================================================================================
+# ===========================================================================================================
 
     # ===========================================
     #			HELP Section
@@ -246,10 +245,10 @@ class HSApp(Gtk.Window):
 
         #Functions.callBox(self, "Select a category from the dropdown menu and click <b>Run Skel</b> to\n update that specific config from <b>/etc/skel</b> to your home\n directory", "How it works.")
 
-
     # ===========================================
     #			DELETE BACKUP Section
     # ===========================================
+
     def on_delete_clicked(self, widget):
         for filename in os.listdir(home + "/" + bd):
             if filename == self.backs.get_active_text():
@@ -260,45 +259,38 @@ class HSApp(Gtk.Window):
     # ===========================================
     #			REFRESH BACKUP Section
     # ===========================================
-    
+
     def on_refresh_clicked(self, widget):
         Functions.refresh(self)
-        
 
     # ===========================================
     #		DELETE ALL BACKUP Section
     # ===========================================
-    def on_flush_clicked(self, widget):
-        print("FLUSH!")
-        for filename in os.listdir(home + "/" + bd):
-            if os.path.isdir(home + "/" + bd + "/" + filename):
-                shutil.rmtree(home + "/" + bd + "/" + filename)
-        
 
-        for filename in os.listdir(home + "/" + bd):
-            if os.path.isfile(home + "/" + bd + "/" + filename):
-                os.unlink(home + "/" + bd + "/" + filename)
-        Functions.refresh(self)
-        Functions.callBox(self, ".SkelApp_Backups directory has been cleaned.", "Success!!")
+    def on_flush_clicked(self, widget):
+        t1 = threading.Thread(target=Functions.Flush_All, args=(self,))
+        t1.daemon = True
+        t1.start()
 
     # ===========================================
     #			UPGRADE BASHRC Section
     # ===========================================
     def on_bashrc_skel_clicked(self, widget):
-        
+
         now = datetime.datetime.now()
         Functions.setMessage(self, "Running Backup")
         if not os.path.exists(home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H")):
-            os.makedirs(home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H"))
-            
+            os.makedirs(home + "/" + bd + "/Backup-" +
+                        now.strftime("%Y-%m-%d %H"))
+
         shutil.copy(
             home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
             now.strftime("%Y-%m-%d %H:%M:%S"))
         shutil.copy(
             home + '/.inputrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.inputrc-backup-" +
             now.strftime("%Y-%m-%d %H:%M:%S"))
-        
-        GLib.idle_add(Functions.setMessage,self, "Done")
+
+        GLib.idle_add(Functions.setMessage, self, "Done")
         shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
         shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc-latest")
         shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc")
@@ -325,235 +317,19 @@ class HSApp(Gtk.Window):
 # =========================================================================================================
 #			                       FUNCTIONS Section
 # =========================================================================================================
-    
-    
-    # ===========================================
-    #		SKEL FUNCTION
-    # ===========================================
-    def run(self, cat):
-
-        # ===========================================
-        #		POLYBAR
-        # ===========================================
-        if cat == "polybar Configs":
-            self.ecode = 0
-            print(self.ecode)
-            src = '/etc/skel/.config/polybar/'
-            if not os.path.exists(src):
-                self.ecode = 1
-            else:
-                Functions.copytree(self, src,
-                                   home + '/.config/polybar/')
-                print("Path copied")
-
-            print(self.ecode)
-        
-        # ===========================================
-        #		HERBSTLUFTWM
-        # ===========================================
-        elif cat == "herbstluftwm Configs":
-            self.ecode = 0
-            src = '/etc/skel/.config/herbstluftwm/'
-            if not os.path.exists(src):
-                self.ecode = 1
-                print(self.ecode)
-            else:
-                Functions.copytree(self, src, home + '/.config/herbstluftwm/',
-                                   )
-                print("Path copied")
-
-        # ===========================================
-        #		BSPWM
-        # ===========================================
-        elif cat == "bspwm Configs":
-            self.ecode = 0
-            src = '/etc/skel/.config/bspwm/'
-            if not os.path.exists(src):
-                self.ecode = 1
-            else:
-                Functions.copytree(self, src, home + '/.config/bspwm/'
-                                   )
-                print("Path copied")
-
-        # ===========================================
-        #		Betterlockscreen
-        # ===========================================
-        elif cat == "betterlockscreen cache":
-            self.ecode = 0
-            src1 = '/etc/skel/.cache/i3lock'
-
-            if not os.path.exists(src1):
-                self.ecode = 1
-            else:
-                Functions.copytree(self, src1, home + '/.cache/i3lock')
-
-        # ===========================================
-        #		ROOT
-        # ===========================================
-        elif cat == "root Configs":
-            self.ecode = 0
-            src1 = '/etc/skel/'
-
-            if not os.path.exists(src1):
-                self.ecode = 1
-            else:
-                for filename in os.listdir(src1):
-                    if os.path.isfile(src1 + filename):
-                        print(filename)
-                        shutil.copy(src1 + filename,
-                                    home + "/" + filename)
-
-            print("Root Configs copied")
-
-        # ===========================================
-        #		LOCALS
-        # ===========================================
-        elif cat == "Local Configs":
-            self.ecode = 0
-            src1 = '/etc/skel/.local/bin'
-            src2 = '/etc/skel/.local/share'
-            
-            if not os.path.exists(src1) or not os.path.exists(src2):
-                self.ecode = 1
-            else:
-                for filename in os.listdir(src1):
-                    shutil.copy(src1 + "/" + filename, home + '/.local/bin/' + filename)
-                
-                for filename in os.listdir(src2):
-                    if os.path.exists(src2 + "/" + filename) and filename != "xfce4":
-                        print(filename)
-                        Functions.copytree(self, src2 + "/" + filename, home + '/.local/share/' + filename)
-
-            print(".local copied")
-        
-        # ===========================================
-        #		CONKY
-        # ===========================================
-        elif cat == "Conky Configs":
-            self.ecode = 0
-            src1 = '/etc/skel/.lua'
-            src2 = '/etc/skel/.conkyrc'
-            if not os.path.exists(src1) or not os.path.isfile(src2):
-                self.ecode = 1
-            else:
-                Functions.copytree(self, src1, home + '/.lua')
-                shutil.copy(src2, home + '/.conkyrc')
-
-            print("Conky copied")
-
-        # ===========================================
-        #		DCONF
-        # ===========================================
-        elif cat == "dconf Configs":
-            self.ecode = 0
-            src1 = '/etc/skel/.config/dconf'
-            if not os.path.exists(src1):
-                self.ecode = 1
-            else:
-                Functions.copytree(self, src1, home + '/.config/dconf'
-                                   )
-
-            print(".local copied")
-
-        # ===========================================
-        #		XFCE
-        # ===========================================
-        elif cat == "xfce Configs":
-            self.ecode = 0
-            src1 = '/etc/skel/.config/xfce4'
-            src4 = '/etc/skel/.config/Thunar'
-            src8 = '/etc/skel/.config/autostart'
-
-            if not os.path.exists(src1):
-                self.ecode = 1
-            else:
-                for folder in os.listdir(src1):
-                    if os.path.isdir(src1 + "/" + folder):
-                        Functions.copytree(
-                            self, src1 + "/" + folder, home + '/.config/xfce4/' + folder)
-                    elif os.path.isfile(src1 + "/" + folder):
-                        shutil.copy(src1 + "/" + folder,
-                                    home + "/.config/xfce4/" + folder)
-
-            if not os.path.exists(src4):
-                self.ecode = 1
-            else:
-                for filename in os.listdir(src4):
-                    if os.path.isfile(src4 + "/" + filename):
-                        shutil.copy(src4 + "/" + filename,
-                                    home + "/.config/Thunar/" + filename)
-
-            if not os.path.exists(src8):
-                self.ecode = 1
-            else:
-                for filename in os.listdir(src8):
-                    if os.path.isfile(src8 + "/" + filename):
-                        shutil.copy(src8 + "/" + filename, home + "/.config/autostart/" + filename
-                                    )
-
-            print("xfce copied")
-
-        # ===========================================
-        #		XFCE_CONFIGS PACKAGE
-        # ===========================================
-        elif cat == "xfce-config package":
-            self.ecode = 0
-            list = ["fontconfig","galculator","gtk-3.0","htop","nano","nomacs","qt5ct", "rofi", "volumeicon","mimeapps.list","Trolltech.conf","yad.conf"]
-            for item in list:                
-                if os.path.isdir("/etc/skel/.config/" + item):
-                    Functions.copytree(
-                        self, "/etc/skel/.config/" + item, home + '/.config/' + item)
-
-                if os.path.isfile("/etc/skel/.config/" + item):
-                    shutil.copy("/etc/skel/.config/" + item, home + "/.config/" + item)
-
-            print("xfce copied")
-
-        # ===========================================
-        #		HLWM/BSPWM CONFIGS PACKAGE
-        # ===========================================
-        elif cat == "hlwm/bspwm configs package":
-            self.ecode = 0
-            src1 = '/etc/skel/.config/herbstluftwm/'
-            src2 = '/etc/skel/.config/bspwm/'
-            if not os.path.exists(src1) or not os.path.exists(src2):
-                print("DOES NOT EXIST")
-                self.ecode = 1
-            else:
-                list = ["dunst","fontconfig","galculator","gtk-3.0","htop","nano","nomacs","qt5ct","ranger","rofi","volumeicon","mimeapps.list","Trolltech.conf","yad.conf"]
-                for item in list:                
-                    if os.path.isdir("/etc/skel/.config/" + item):
-                        Functions.copytree(
-                            self, "/etc/skel/.config/" + item, home + '/.config/' + item)
-
-                    if os.path.isfile("/etc/skel/.config/" + item):
-                        shutil.copy("/etc/skel/.config/" + item, home + "/.config/" + item)
-
-                print("hlwm-config copied")
-
-        Functions.setProgress(self,1)
-        print("ErrorCode: ",self.ecode)
-        if(self.ecode == 1):
-            Functions.callBox(self, "Cant seem to find that source. Have you got it installed?", "Success!!")
-        else:
-            Functions.callBox(self, "Skel executed successfully.", "Success!!")
-
-        Functions.setProgress(self,0)
-        self.btn2.set_sensitive(True)
-        Functions.setMessage(self, "Idle...")
 
 
     def resizeImage(self, x, y):
         pixbuf = self.pixbuf.scale_simple(x, y,
-                                        GdkPixbuf.InterpType.HYPER)
+                                          GdkPixbuf.InterpType.HYPER)
         self.image.set_from_pixbuf(pixbuf)
 
     def on_check_resize(self, window):
         boxAllocation = self.hboxHDR.get_allocation()
         self.image_area.set_allocation(boxAllocation)
         self.resizeImage(boxAllocation.width,
-                        boxAllocation.height)
-#============================================================================================================
+                         boxAllocation.height)
+# ============================================================================================================
 
 
 def signal_handler(sig, frame):
