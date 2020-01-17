@@ -16,7 +16,7 @@ class Help(Gtk.Window):
             base_dir, 'images/hefftorlinux.svg'))
         self.set_position(Gtk.WindowPosition.NONE)
 
-        self.connect("check_resize", self.on_check_resize)
+        # self.connect("check_resize", self.on_check_resize)
 
         hb = Gtk.HeaderBar()
         hb.props.show_close_button = True
@@ -37,7 +37,11 @@ class Help(Gtk.Window):
         self.hvbox.pack_start(self.listviewHDRH, True, True, 0)
 
         # ListRow 1
+        self.temp_height = 0
+        self.temp_width = 0
+
         self.listRowHDRH = Gtk.ListBoxRow()
+        box = Gtk.ScrolledWindow()
         self.hboxHDRH = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRowHDRH.add(self.hboxHDRH)
@@ -45,11 +49,12 @@ class Help(Gtk.Window):
         self.pixbufH = GdkPixbuf.Pixbuf().new_from_file(
             os.path.join(base_dir, 'images/logo_help.png'))
         self.image = Gtk.Image().new_from_pixbuf(self.pixbufH)
-        self.image_areaH = Gtk.Box()
-        self.image_areaH.add(self.image)
-        self.image_areaH.show_all()
+        self.connect('check_resize', self.on_image_resize)
 
-        self.hboxHDRH.pack_start(self.image_areaH, True, True, 0)
+        box.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        box.add(self.image)
+
+        self.hboxHDRH.pack_start(box, True, True, 0)
         self.listviewHDRH.add(self.listRowHDRH)
 
         # ===========================================
@@ -223,13 +228,22 @@ backup\nSo every backup made within that hour will be placed in that folder.")
 
 # ===============================================================================================================================
 
-    def resizeImage(self, x, y):
-        pixbuf = self.pixbufH.scale_simple(x, y,
-                                           GdkPixbuf.InterpType.HYPER)
-        self.image.set_from_pixbuf(pixbuf)
+    # def resizeImage(self, x, y):
+    #     pixbuf = self.pixbufH.scale_simple(x, y,
+    #                                        GdkPixbuf.InterpType.HYPER)
+    #     self.image.set_from_pixbuf(pixbuf)
 
-    def on_check_resize(self, window):
-        boxAllocation = self.hboxHDRH.get_allocation()
-        self.image_areaH.set_allocation(boxAllocation)
-        self.resizeImage(boxAllocation.width,
-                         boxAllocation.height)
+    # def on_check_resize(self, window):
+    #     boxAllocation = self.hboxHDRH.get_allocation()
+    #     self.image_areaH.set_allocation(boxAllocation)
+    #     self.resizeImage(boxAllocation.width,
+    #                      boxAllocation.height)
+
+    def on_image_resize(self, widget):
+        allocation = self.hboxHDRH.get_allocation()
+        if self.temp_height != allocation.height or self.temp_width != allocation.width:
+            self.temp_height = allocation.height
+            self.temp_width = allocation.width
+            pixbuf = self.pixbufH.scale_simple(
+                allocation.width, allocation.height, GdkPixbuf.InterpType.BILINEAR)
+            self.image.set_from_pixbuf(pixbuf)
