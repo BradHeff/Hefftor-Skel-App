@@ -440,6 +440,14 @@ def run(self, cat):
 
             print("hlwm-config copied")
 
+    else:
+        new = cat.replace("/etc/skel",home)
+        if os.path.isdir(cat):
+            copytree(self, cat, new)
+        if os.path.isfile(cat):
+            shutil.copy(cat, new)
+        
+
     setProgress(self,1)
     if(self.ecode == 1):
         callBox(self, "Cant seem to find that source. Have you got it installed?", "Success!!")

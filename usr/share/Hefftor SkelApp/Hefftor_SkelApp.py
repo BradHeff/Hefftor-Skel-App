@@ -112,19 +112,53 @@ class HSApp(Gtk.Window):
         self.listRow1 = Gtk.ListBoxRow()
         self.hbox1 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        self.listRow1.add(self.hbox1)
+        self.hboxman = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.hboxchoose = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.vboxConfig = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.listRow1.add(self.vboxConfig)
+
+        self.vboxConfig.pack_start(self.hbox1, True, True, 0)
+        self.vboxConfig.pack_start(self.hboxman, True, True, 0)
+        self.vboxConfig.pack_start(self.hboxchoose, True, True, 0)
 
         # ListRow 1 Elements
-        self.label1 = Gtk.Label(xalign=0)
-        self.label1.set_markup("<b>Select Category</b>")
+        # self.label1 = Gtk.Label(xalign=0)
+        # self.label1.set_markup("<b>Select Category</b>")
         self.cat = Gtk.ComboBoxText()
         for CATS in MENU_CATS:
             self.cat.append_text(CATS)
         self.cat.set_active(0)
         self.cat.set_size_request(170, 0)
 
-        self.hbox1.pack_start(self.label1, False, False, 0)
+        self.rbutton = Gtk.RadioButton(label="Preconfigured")
+        self.rbutton.connect("toggled", self.toggled_cb)
+        self.rbutton2 = Gtk.RadioButton.new_from_widget(self.rbutton)
+        self.rbutton2.set_label("Manual")
+        self.rbutton2.connect("toggled", self.toggled_cb)
+        self.rbutton2.set_active(False)
+
+        self.rbutton3 = Gtk.RadioButton(label="File")
+        self.rbutton4 = Gtk.RadioButton.new_from_widget(self.rbutton3)
+        self.rbutton4.set_label("Folder")
+
+        self.browse = Gtk.Button(label=". . .")
+        self.browse.connect("clicked", self.on_browse_fixed)
+        self.textBox = Gtk.Entry()
+
+        self.hbox1.pack_start(self.rbutton, False, False, 0)
+        # self.hbox1.pack_start(self.label1, False, False, 0)
         self.hbox1.pack_end(self.cat, True, True, 0)
+
+        self.hboxman.pack_start(self.rbutton2, False, False, 0)
+        self.hboxman.pack_start(self.textBox, True, True, 0)
+        self.hboxman.pack_start(self.browse, False, False, 0)
+
+        self.hboxchoose.pack_start(self.rbutton3, True, False, 0)
+        self.hboxchoose.pack_start(self.rbutton4, True, False, 0)
+
         self.listview1.add(self.listRow1)
 
         # ===========================================
@@ -286,7 +320,40 @@ class HSApp(Gtk.Window):
         self.hbox3.pack_start(self.label3, True, False, 0)
         self.listview3.add(self.listRow3)
 
+        self.textBox.set_sensitive(False)
+        self.browse.set_sensitive(False)
 # ===========================================================================================================
+
+    def toggled_cb(self, button):
+        if self.rbutton2.get_active():
+            self.textBox.set_sensitive(True)
+            self.browse.set_sensitive(True)
+        else:
+            self.textBox.set_sensitive(False)
+            self.browse.set_sensitive(False)
+
+    def on_browse_fixed(self, widget):
+        if self.rbutton3.get_active():
+            dialog = Gtk.FileChooserDialog(
+                title="Please choose a file", action=Gtk.FileChooserAction.OPEN)
+        elif self.rbutton4.get_active():
+            dialog = Gtk.FileChooserDialog(
+                title="Please choose a folder", action=Gtk.FileChooserAction.SELECT_FOLDER)
+
+        dialog.set_current_folder("/etc/skel")
+        dialog.add_buttons(
+            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Open", Gtk.ResponseType.OK)
+
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            foldername = dialog.get_filename()
+            self.textBox.set_text(foldername)
+
+            dialog.destroy()
+        elif response == Gtk.ResponseType.CANCEL:
+            # print("Cancel clicked")
+            dialog.destroy()
 
     # ===========================================
     #			HELP Section
@@ -379,16 +446,32 @@ class HSApp(Gtk.Window):
     #			RUN SKEL Section
     # ===========================================
     def on_button_fetch_clicked(self, widget):
+        passes = False
 
-        self.button_toggles(False)
-        if self.switch.get_active():
-            Functions.setMessage(self, "Running Backup")
-            t1 = threading.Thread(target=Functions.processing,
-                                  args=(self, self.cat.get_active_text(),))
-            t1.daemon = True
-            t1.start()
+        if not self.rbutton.get_active():
+            text = self.textBox.get_text()
+
+            if "/etc/skel" in text:
+                passes = True
         else:
-            Functions.run(self, self.cat.get_active_text())
+            text = self.cat.get_active_text()
+            passes = True
+
+        if passes == True:
+
+            self.button_toggles(False)
+            if self.switch.get_active():
+                Functions.setMessage(self, "Running Backup")
+                t1 = threading.Thread(target=Functions.processing,
+                                      args=(self, text,))
+                t1.daemon = True
+                t1.start()
+            else:
+                Functions.run(self, text)
+        else:
+            if not self.rbutton.get_active():
+                Functions.callBox(
+                    self, "It looks like your out of the /etc/skel directory", "Failed!!")
 
     def button_toggles(self, state):
         self.btn2.set_sensitive(state)
