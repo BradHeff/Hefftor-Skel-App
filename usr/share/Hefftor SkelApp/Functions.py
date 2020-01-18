@@ -441,11 +441,26 @@ def run(self, cat):
             print("hlwm-config copied")
 
     else:
-        new = cat.replace("/etc/skel",home)
-        if os.path.isdir(cat):
-            copytree(self, cat, new)
-        if os.path.isfile(cat):
-            shutil.copy(cat, new)
+        if "," in cat:
+            for filename in cat.split(','):
+                old = filename.replace(" \'", "").replace("\'","").replace("[","").replace("]","")
+                
+                new = old.replace("/etc/skel",home)
+                if os.path.isdir(old):
+                    copytree(self, old, new)
+                if os.path.isfile(old):
+                    shutil.copy(old, new)
+        else:
+            old = cat.replace(" \'", "").replace("\'","").replace("[","").replace("]","")
+            new = old.replace("/etc/skel",home)
+            print(old)
+            print(new)
+            if os.path.isdir(old):
+                copytree(self, old, new, True)
+            if os.path.isfile(old):
+                shutil.copy(old, new)
+            
+        
         
 
     setProgress(self,1)

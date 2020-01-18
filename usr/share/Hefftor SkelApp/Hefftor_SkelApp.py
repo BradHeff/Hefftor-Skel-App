@@ -336,6 +336,7 @@ class HSApp(Gtk.Window):
         if self.rbutton3.get_active():
             dialog = Gtk.FileChooserDialog(
                 title="Please choose a file", action=Gtk.FileChooserAction.OPEN)
+            dialog.set_select_multiple(True)
         elif self.rbutton4.get_active():
             dialog = Gtk.FileChooserDialog(
                 title="Please choose a folder", action=Gtk.FileChooserAction.SELECT_FOLDER)
@@ -347,8 +348,8 @@ class HSApp(Gtk.Window):
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
-            foldername = dialog.get_filename()
-            self.textBox.set_text(foldername)
+            foldername = dialog.get_filenames()
+            self.textBox.set_text(str(foldername))
 
             dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
