@@ -322,14 +322,20 @@ class HSApp(Gtk.Window):
 
         self.textBox.set_sensitive(False)
         self.browse.set_sensitive(False)
+        self.rbutton3.set_sensitive(False)
+        self.rbutton4.set_sensitive(False)
 # ===========================================================================================================
 
     def toggled_cb(self, button):
         if self.rbutton2.get_active():
             self.textBox.set_sensitive(True)
             self.browse.set_sensitive(True)
+            self.rbutton3.set_sensitive(True)
+            self.rbutton4.set_sensitive(True)
         else:
             self.textBox.set_sensitive(False)
+            self.rbutton3.set_sensitive(False)
+            self.rbutton4.set_sensitive(False)
             self.browse.set_sensitive(False)
 
     def on_browse_fixed(self, widget):
@@ -340,7 +346,7 @@ class HSApp(Gtk.Window):
         elif self.rbutton4.get_active():
             dialog = Gtk.FileChooserDialog(
                 title="Please choose a folder", action=Gtk.FileChooserAction.SELECT_FOLDER)
-
+            dialog.set_select_multiple(True)
         dialog.set_current_folder("/etc/skel")
         dialog.add_buttons(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Open", Gtk.ResponseType.OK)

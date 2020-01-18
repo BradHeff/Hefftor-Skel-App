@@ -447,14 +447,12 @@ def run(self, cat):
                 
                 new = old.replace("/etc/skel",home)
                 if os.path.isdir(old):
-                    copytree(self, old, new)
+                    copytree(self, old, new, True)
                 if os.path.isfile(old):
                     shutil.copy(old, new)
         else:
             old = cat.replace(" \'", "").replace("\'","").replace("[","").replace("]","")
             new = old.replace("/etc/skel",home)
-            print(old)
-            print(new)
             if os.path.isdir(old):
                 copytree(self, old, new, True)
             if os.path.isfile(old):
