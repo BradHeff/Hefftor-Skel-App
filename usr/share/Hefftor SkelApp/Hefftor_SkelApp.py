@@ -147,10 +147,11 @@ class HSApp(Gtk.Window):
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.hbox10 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        self.listRow4.add(self.hbox4)
+        self.vboxDelete = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL, spacing=10)
+
+        self.listRow4.add(self.vboxDelete)
         self.listRow5.add(self.hbox5)
-        self.listRow9.add(self.hbox9)
-        self.listRow10.add(self.hbox10)
 
         # ListRow 1 Elements
         self.backs = Gtk.ComboBoxText()
@@ -162,7 +163,7 @@ class HSApp(Gtk.Window):
         self.btn9 = Gtk.Button(label="Clean All Backups")
 
         self.backs_inner = Gtk.ComboBoxText()
-        self.refresh_inner()
+        Functions.refresh_inner(self)
         self.backs_inner.set_active(0)
         self.backs_inner.set_size_request(170, 0)
         self.btn10 = Gtk.Button(label="Delete")
@@ -181,15 +182,17 @@ class HSApp(Gtk.Window):
         self.hbox4.pack_end(self.btn5, True, True, 0)
 
         self.hbox10.pack_start(self.backs_inner, True, True, 0)
-        self.hbox10.pack_start(self.btn10, True, True, 0)
+        self.hbox10.pack_start(self.btn10, False, False, 0)
 
         self.hbox9.pack_start(self.btn9, True, True, 0)
-        self.hbox10.pack_start(self.btn9, True, True, 0)
+        # self.hbox10.pack_start(self.btn9, True, True, 0)
 
         self.listview4.add(self.listRow5)
         self.listview4.add(self.listRow4)
-        self.listview4.add(self.listRow10)
-        self.listview4.add(self.listRow9)
+
+        self.vboxDelete.pack_start(self.hbox4, True, True, 0)
+        self.vboxDelete.pack_start(self.hbox10, True, True, 0)
+        self.vboxDelete.pack_start(self.hbox9, True, True, 0)
 
         self.backs.connect("changed", self.backs_changed)
 
@@ -269,33 +272,6 @@ class HSApp(Gtk.Window):
 
 # ===========================================================================================================
 
-    def on_delete_inner_clicked(self, widget):
-        self.button_toggles(False)
-        t1 = threading.Thread(
-            target=Functions.Delete_Inner_Backup, args=(self,))
-        t1.daemon = True
-        t1.start()
-
-    def backs_changed(self, d):
-        self.refresh_inner()
-
-    def refresh_inner(self):
-        count = os.listdir(home + "/" + bd).__len__()
-
-        if count > 0:
-            if os.path.isdir(home + "/" + bd + "/" + self.backs.get_active_text()):
-                self.backs_inner.get_model().clear()
-                BACKUPS_FOLDER = []
-                for filename in os.listdir(home + "/" + bd + "/" + self.backs.get_active_text()):
-                    BACKUPS_FOLDER.append(filename)
-                for item in BACKUPS_FOLDER:
-                    self.backs_inner.append_text(item)
-
-                self.backs_inner.set_active(0)
-        else:
-            self.backs_inner.get_model().clear()
-            BACKUPS_FOLDER = []
-
     # ===========================================
     #			HELP Section
     # ===========================================
@@ -304,11 +280,16 @@ class HSApp(Gtk.Window):
         w = Help.Help()
         w.show_all()
 
-        #Functions.callBox(self, "Select a category from the dropdown menu and click <b>Run Skel</b> to\n update that specific config from <b>/etc/skel</b> to your home\n directory", "How it works.")
-
     # ===========================================
     #			DELETE BACKUP Section
     # ===========================================
+
+    def on_delete_inner_clicked(self, widget):
+        self.button_toggles(False)
+        t1 = threading.Thread(
+            target=Functions.Delete_Inner_Backup, args=(self,))
+        t1.daemon = True
+        t1.start()
 
     def on_delete_clicked(self, widget):
         self.button_toggles(False)
@@ -322,6 +303,9 @@ class HSApp(Gtk.Window):
 
     def on_refresh_clicked(self, widget):
         Functions.refresh(self)
+
+    def backs_changed(self, d):
+        Functions.refresh_inner(self)
 
     # ===========================================
     #		DELETE ALL BACKUP Section
