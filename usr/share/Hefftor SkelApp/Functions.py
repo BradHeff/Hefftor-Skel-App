@@ -77,10 +77,11 @@ def refresh(self):
 
     self.backs.get_model().clear()
     BACKUPS_CATS = []
+    
     for filename in os.listdir(home + "/" + bd):
         if os.path.isdir(home + "/" + bd + "/" + filename):
             BACKUPS_CATS.append(filename)
-    print(BACKUPS_CATS)
+    
     for item in BACKUPS_CATS:
         self.backs.append_text(item)
 
@@ -88,12 +89,13 @@ def refresh(self):
     
 def refresh_inner(self):
     count = os.listdir(home + "/" + bd).__len__()
+    active_text = "".join([str(self.backs.get_active_text()), ""])
 
     if count > 0:
-        if os.path.isdir(home + "/" + bd + "/" + self.backs.get_active_text()):
+        if os.path.isdir(home + "/" + bd + "/" + active_text):
             self.backs_inner.get_model().clear()
             BACKUPS_FOLDER = []
-            for filename in os.listdir(home + "/" + bd + "/" + self.backs.get_active_text()):
+            for filename in os.listdir(home + "/" + bd + "/" + active_text):
                 BACKUPS_FOLDER.append(filename)
             for item in BACKUPS_FOLDER:
                 self.backs_inner.append_text(item)
@@ -102,6 +104,7 @@ def refresh_inner(self):
     else:
         self.backs_inner.get_model().clear()
         BACKUPS_FOLDER = []
+
 # ===========================================
 #		MESSAGEBOX FUNCTION
 # ===========================================
@@ -164,9 +167,10 @@ def processing(self, active_text):
         # ============================
         #       CONFIG
         # ============================
-
+        
         copytree(self, home + '/.config', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.config_backup-' +
                  now.strftime("%Y-%m-%d %H:%M:%S"))
+
         GLib.idle_add(setProgress, self, 0.3)
 
         # ============================
@@ -187,11 +191,14 @@ def processing(self, active_text):
         # ============================
         #       CONKY
         # ============================
-        copytree(self, home + '/.lua', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.lua_backup-' +
-                 now.strftime("%Y-%m-%d %H:%M:%S"))
-        shutil.copy(
-            home + '/.conkyrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.conkyrc-backup-" +
-            now.strftime("%Y-%m-%d %H:%M:%S"))
+        if os.path.exists(home + '/.lua'):
+            copytree(self, home + '/.lua', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.lua_backup-' +
+                    now.strftime("%Y-%m-%d %H:%M:%S"))
+
+        if os.path.isfile(home + '/.conkyrc'):
+            shutil.copy(
+                home + '/.conkyrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.conkyrc-backup-" +
+                now.strftime("%Y-%m-%d %H:%M:%S"))
 
         self.firstrun = 1
         GLib.idle_add(setMessage, self, "Done")
@@ -219,8 +226,7 @@ def run(self, cat):
             copytree(self, src,
                                 home + '/.config/polybar/')
             print("Path copied")
-
-        print(self.ecode)
+ 
     
     # ===========================================
     #		HERBSTLUFTWM
@@ -230,7 +236,6 @@ def run(self, cat):
         src = '/etc/skel/.config/herbstluftwm/'
         if not os.path.exists(src):
             self.ecode = 1
-            print(self.ecode)
         else:
             copytree(self, src, home + '/.config/herbstluftwm/',
                                 )
@@ -273,7 +278,6 @@ def run(self, cat):
         else:
             for filename in os.listdir(src1):
                 if os.path.isfile(src1 + filename):
-                    print(filename)
                     shutil.copy(src1 + filename,
                                 home + "/" + filename)
 
@@ -295,7 +299,6 @@ def run(self, cat):
             
             for filename in os.listdir(src2):
                 if os.path.exists(src2 + "/" + filename) and filename != "xfce4":
-                    # print(filename)
                     copytree(self, src2 + "/" + filename, home + '/.local/share/' + filename)
 
         print(".local copied")
@@ -424,7 +427,6 @@ def run(self, cat):
         src1 = '/etc/skel/.config/herbstluftwm/'
         src2 = '/etc/skel/.config/bspwm/'
         if not os.path.exists(src1) or not os.path.exists(src2):
-            print("DOES NOT EXIST")
             self.ecode = 1
         else:
             list = ["dunst","fontconfig","galculator","gtk-3.0","htop","nano","nomacs","qt5ct","ranger","rofi","volumeicon","mimeapps.list","Trolltech.conf","yad.conf"]

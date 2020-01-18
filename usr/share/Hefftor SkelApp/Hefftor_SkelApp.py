@@ -235,17 +235,33 @@ class HSApp(Gtk.Window):
         self.listRow6 = Gtk.ListBoxRow()
         self.hbox6 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        self.listRow6.add(self.hbox6)
+        self.hbox11 = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.vboxRun = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.listRow6.add(self.vboxRun)
 
         # ListRow 1 Elements
         self.btn2 = Gtk.Button(label="Run Skel")
         self.btn2.connect("clicked", self.on_button_fetch_clicked)
         self.label4 = Gtk.Label(xalign=0)
         self.label4.set_markup("<i>Idle...</i>")
+        self.labelBacks = Gtk.Label(xalign=0)
+        self.labelBacks.set_markup("<b>Run Backup Before Skel</b>")
+
+        self.switch = Gtk.Switch()
+        self.switch.set_active(True)
 
         self.hbox6.pack_end(self.btn2, True, True, 0)
         self.hbox6.pack_start(self.label4, True, True, 0)
+
+        self.hbox11.pack_start(self.labelBacks, True, True, 0)
+        self.hbox11.pack_start(self.switch, False, False, 0)
+
         self.listview6.add(self.listRow6)
+
+        self.vboxRun.pack_start(self.hbox11, True, True, 0)
+        self.vboxRun.pack_start(self.hbox6, True, True, 0)
 
         self.progressbar = Gtk.ProgressBar()
         self.vbox.pack_start(self.progressbar, True, True, 0)
@@ -352,13 +368,14 @@ class HSApp(Gtk.Window):
     def on_button_fetch_clicked(self, widget):
 
         self.button_toggles(False)
-        if self.firstrun == 0:
+        if self.switch.get_active():
             Functions.setMessage(self, "Running Backup")
-
-        t1 = threading.Thread(target=Functions.processing,
-                              args=(self, self.cat.get_active_text(),))
-        t1.daemon = True
-        t1.start()
+            t1 = threading.Thread(target=Functions.processing,
+                                  args=(self, self.cat.get_active_text(),))
+            t1.daemon = True
+            t1.start()
+        else:
+            Functions.run(self, self.cat.get_active_text())
 
     def button_toggles(self, state):
         self.btn2.set_sensitive(state)
