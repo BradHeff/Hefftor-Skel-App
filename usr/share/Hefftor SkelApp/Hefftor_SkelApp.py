@@ -340,6 +340,7 @@ class HSApp(Gtk.Window):
         self.button_toggles(False)
         now = datetime.datetime.now()
         Functions.setMessage(self, "Running Backup")
+
         if not os.path.exists(home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H")):
             os.makedirs(home + "/" + bd + "/Backup-" +
                         now.strftime("%Y-%m-%d %H"))
@@ -347,17 +348,29 @@ class HSApp(Gtk.Window):
         shutil.copy(
             home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
             now.strftime("%Y-%m-%d %H:%M:%S"))
-        shutil.copy(
-            home + '/.inputrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.inputrc-backup-" +
-            now.strftime("%Y-%m-%d %H:%M:%S"))
+
+        if os.path.isfile(home + '/.inputrc'):
+            shutil.copy(
+                home + '/.inputrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.inputrc-backup-" +
+                now.strftime("%Y-%m-%d %H:%M:%S"))
 
         Functions.setMessage(self, "Upgrading Bashrc")
-        shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
-        shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc-latest")
-        shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc")
-        shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc-latest")
-        Functions.setMessage(self, "Bashrc Done")
-        Functions.callBox(self, "bashrc upgraded", "Success!!")
+
+        if os.path.isfile("/etc/skel/.bashrc-latest"):
+            shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
+            shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc-latest")
+
+            if os.path.isfile("/etc/skel/.inputrc-latest"):
+                shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc")
+                shutil.copy("/etc/skel/.inputrc-latest",
+                            home + "/.inputrc-latest")
+
+            Functions.setMessage(self, ".bashrc upgrade done")
+            Functions.callBox(self, "bashrc upgraded", "Success!!")
+        else:
+            Functions.callBox(
+                self, "bashrc upgrade failed, you dont have a .bashrc-latest in skel", "Failed!!")
+
         Functions.setMessage(self, "Idle...")
         Functions.refresh(self)
         self.button_toggles(True)
