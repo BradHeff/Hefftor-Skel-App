@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import Functions
 import Help
+import ImageX
 
 import threading
 import datetime
@@ -61,38 +62,41 @@ class HSApp(Gtk.Window):
         self.add(self.vbox)
 
         # ===========================================
-        #				HELP Section
-        # ===========================================
-        self.btnhelp = Gtk.Button(label="How to use SkelApp")
-        self.btnhelp.connect("clicked", self.on_help_clicked)
-        self.vbox.pack_start(self.btnhelp, True, True, 0)
-
-        # ===========================================
         #				HEADER Section
         # ===========================================
         self.listviewHDR = Gtk.ListBox()
         self.listviewHDR.set_selection_mode(Gtk.SelectionMode.NONE)
         self.vbox.pack_start(self.listviewHDR, True, True, 0)
 
-        # ListRow 1
+        # ===========================================
+        #				HELP Section
+        # ===========================================
+        self.btnhelp = Gtk.Button(label="How to use SkelApp")
+        self.btnhelp.connect("clicked", self.on_help_clicked)
+        # self.vbox.pack_start(self.btnhelp, True, True, 0)
 
-        self.temp_height = 0
-        self.temp_width = 0
+        # ListRow 1
+        # self.temp_height = 0
+        # self.temp_width = 0
 
         self.listRowHDR = Gtk.ListBoxRow()
-        box = Gtk.ScrolledWindow()
+        # box = Gtk.ScrolledWindow()
+
         self.hboxHDR = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRowHDR.add(self.hboxHDR)
 
         self.pixbuf = GdkPixbuf.Pixbuf().new_from_file_at_size(
-            os.path.join(base_dir, 'images/logo.png'), 300, 50)
+            os.path.join(base_dir, 'images/logo1.png'), 300, 50)
         self.image = Gtk.Image().new_from_pixbuf(self.pixbuf)
-        self.connect('check_resize', self.on_image_resize)
+        # self.connect('check_resize', self.on_image_resize)
 
-        box.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        box.add(self.image)
-        self.hboxHDR.pack_start(box, True, True, 0)
+        # self.image.connect("size-allocate", self.on_size_allocate)
+
+        # box.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        # box.add(self.image)
+        self.hboxHDR.pack_start(self.image, False, False, 0)
+        self.hboxHDR.pack_start(self.btnhelp, True, True, 0)
         self.listviewHDR.add(self.listRowHDR)
 
         # ===========================================
@@ -344,15 +348,47 @@ class HSApp(Gtk.Window):
     #     self.image_area.set_allocation(boxAllocation)
     #     self.resizeImage(boxAllocation.width,
     #                      boxAllocation.height)
+    def on_size_allocate(self, obj, rect):
+        # skip if no pixbuf set
+        if self.pixbuf is None:
+            return
 
-    def on_image_resize(self, widget):
-        allocation = self.hboxHDR.get_allocation()
-        if self.temp_height != allocation.height or self.temp_width != allocation.width:
-            self.temp_height = allocation.height
-            self.temp_width = allocation.width
-            pixbuf = self.pixbuf.scale_simple(
-                allocation.width, allocation.height, GdkPixbuf.InterpType.BILINEAR)
-            self.image.set_from_pixbuf(pixbuf)
+        # calculate proportions for image widget and for image
+        k_pixbuf = float(self.pixbuf.props.height) / self.pixbuf.props.width
+        k_rect = float(rect.height) / rect.width
+
+        # recalculate new height and width
+        if k_pixbuf < k_rect:
+            newWidth = rect.width
+            newHeight = int(newWidth * k_pixbuf)
+        else:
+            newHeight = rect.height
+            newWidth = int(newHeight / k_pixbuf)
+
+        # get internal image pixbuf and check that it not yet have new sizes
+        # that's allow us to avoid endless size_allocate cycle
+        base_pixbuf = self.image.get_pixbuf()
+        if base_pixbuf.props.height == newHeight and base_pixbuf.props.width == newWidth:
+            return
+
+        # scale image
+        base_pixbuf = self.pixbuf.scale_simple(
+            newWidth,
+            newHeight,
+            GdkPixbuf.InterpType.BILINEAR
+        )
+
+        # set internal image pixbuf to scaled image
+        self.image.set_from_pixbuf(base_pixbuf)
+
+    # def on_image_resize(self, widget):
+    #     allocation = self.hboxHDR.get_allocation()
+    #     if self.temp_height != allocation.height or self.temp_width != allocation.width:
+    #         self.temp_height = allocation.height
+    #         self.temp_width = allocation.width
+    #         pixbuf = self.pixbuf.scale_simple(
+    #             allocation.width, allocation.height, GdkPixbuf.InterpType.BILINEAR)
+    #         self.image.set_from_pixbuf(pixbuf)
 
 # ============================================================================================================
 
