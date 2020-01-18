@@ -14,16 +14,36 @@ def setProgress(self, value):
 #		DELETE BACKUP FUNCTION
 # ===========================================
 def Delete_Backup(self):
-    GLib.idle_add(setProgress, self, 0.3)
-    for filename in os.listdir(home + "/" + bd):
-        if filename == self.backs.get_active_text():
-            shutil.rmtree(home + "/" + bd + "/" + filename)
-    GLib.idle_add(refresh, self)
-    GLib.idle_add(setProgress, self, 1)
-    GLib.idle_add(callBox,self, "Config backups cleaned.", "Success!!")
+    count = os.listdir(home + "/" + bd).__len__()
+
+    if count > 0:
+        GLib.idle_add(setProgress, self, 0.3)
+        for filename in os.listdir(home + "/" + bd):
+            if filename == self.backs.get_active_text():
+                shutil.rmtree(home + "/" + bd + "/" + filename)
+        GLib.idle_add(refresh, self)
+        GLib.idle_add(self.refresh_inner)
+        GLib.idle_add(setProgress, self, 1)
+        GLib.idle_add(callBox,self, "Config backups cleaned.", "Success!!")
     GLib.idle_add(self.button_toggles, True)
     GLib.idle_add(setProgress, self, 0)
 
+def Delete_Inner_Backup(self):
+    count = os.listdir(home + "/" + bd).__len__()
+
+    if count > 0:
+        GLib.idle_add(setProgress, self, 0.3)
+        for filename in os.listdir(home + "/" + bd + "/" + self.backs.get_active_text()):
+            if filename == self.backs_inner.get_active_text():
+                if os.path.isdir(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename):
+                    shutil.rmtree(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename)
+                elif os.path.isfile(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename):
+                    os.unlink(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename)
+        GLib.idle_add(self.refresh_inner)
+        GLib.idle_add(setProgress, self, 1)
+        GLib.idle_add(callBox,self, "Config backups cleaned.", "Success!!")
+    GLib.idle_add(self.button_toggles, True)
+    GLib.idle_add(setProgress, self, 0)
 # ===========================================
 #		FLUSH ALL FUNCTION
 # ===========================================
@@ -40,6 +60,7 @@ def Flush_All(self):
                 
 
         GLib.idle_add(refresh, self)
+        GLib.idle_add(self.refresh_inner)
         GLib.idle_add(callBox,self, ".SkelApp_Backups directory has been cleaned.", "Success!!")
         GLib.idle_add(setProgress, self, 0)
     GLib.idle_add(self.button_toggles, True)
@@ -62,6 +83,7 @@ def refresh(self):
         self.backs.append_text(item)
 
     self.backs.set_active(0)
+    
 
 # ===========================================
 #		MESSAGEBOX FUNCTION

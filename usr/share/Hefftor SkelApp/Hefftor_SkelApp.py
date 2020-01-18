@@ -34,6 +34,8 @@ MENU_CATS = [
     "hlwm/bspwm configs package"
 ]
 BACKUPS_CATS = []
+BACKUPS_FOLDER = []
+
 bd = ".SkelApp_Backups"
 
 
@@ -136,15 +138,19 @@ class HSApp(Gtk.Window):
         self.listRow4 = Gtk.ListBoxRow()
         self.listRow5 = Gtk.ListBoxRow()
         self.listRow9 = Gtk.ListBoxRow()
+        self.listRow10 = Gtk.ListBoxRow()
         self.hbox4 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.hbox5 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.hbox9 = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.hbox10 = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.listRow4.add(self.hbox4)
         self.listRow5.add(self.hbox5)
         self.listRow9.add(self.hbox9)
+        self.listRow10.add(self.hbox10)
 
         # ListRow 1 Elements
         self.backs = Gtk.ComboBoxText()
@@ -155,9 +161,16 @@ class HSApp(Gtk.Window):
         self.btn5 = Gtk.Button(label="Delete")
         self.btn9 = Gtk.Button(label="Clean All Backups")
 
+        self.backs_inner = Gtk.ComboBoxText()
+        self.refresh_inner()
+        self.backs_inner.set_active(0)
+        self.backs_inner.set_size_request(170, 0)
+        self.btn10 = Gtk.Button(label="Delete")
+
         self.btn4.connect("clicked", self.on_refresh_clicked)
         self.btn5.connect("clicked", self.on_delete_clicked)
         self.btn9.connect("clicked", self.on_flush_clicked)
+        self.btn10.connect("clicked", self.on_delete_inner_clicked)
 
         self.label4 = Gtk.Label(xalign=0)
         self.label4.set_markup("<b>Delete Backups</b>")
@@ -166,11 +179,19 @@ class HSApp(Gtk.Window):
         self.hbox4.pack_start(self.backs, True, True, 0)
         self.hbox4.pack_start(self.btn4, False, False, 0)
         self.hbox4.pack_end(self.btn5, True, True, 0)
+
+        self.hbox10.pack_start(self.backs_inner, True, True, 0)
+        self.hbox10.pack_start(self.btn10, True, True, 0)
+
         self.hbox9.pack_start(self.btn9, True, True, 0)
+        self.hbox10.pack_start(self.btn9, True, True, 0)
 
         self.listview4.add(self.listRow5)
         self.listview4.add(self.listRow4)
+        self.listview4.add(self.listRow10)
         self.listview4.add(self.listRow9)
+
+        self.backs.connect("changed", self.backs_changed)
 
         # ===========================================
         #				BASHRC Section
@@ -248,9 +269,37 @@ class HSApp(Gtk.Window):
 
 # ===========================================================================================================
 
+    def on_delete_inner_clicked(self, widget):
+        self.button_toggles(False)
+        t1 = threading.Thread(
+            target=Functions.Delete_Inner_Backup, args=(self,))
+        t1.daemon = True
+        t1.start()
+
+    def backs_changed(self, d):
+        self.refresh_inner()
+
+    def refresh_inner(self):
+        count = os.listdir(home + "/" + bd).__len__()
+
+        if count > 0:
+            if os.path.isdir(home + "/" + bd + "/" + self.backs.get_active_text()):
+                self.backs_inner.get_model().clear()
+                BACKUPS_FOLDER = []
+                for filename in os.listdir(home + "/" + bd + "/" + self.backs.get_active_text()):
+                    BACKUPS_FOLDER.append(filename)
+                for item in BACKUPS_FOLDER:
+                    self.backs_inner.append_text(item)
+
+                self.backs_inner.set_active(0)
+        else:
+            self.backs_inner.get_model().clear()
+            BACKUPS_FOLDER = []
+
     # ===========================================
     #			HELP Section
     # ===========================================
+
     def on_help_clicked(self, widget):
         w = Help.Help()
         w.show_all()
@@ -333,6 +382,7 @@ class HSApp(Gtk.Window):
         self.btn5.set_sensitive(state)
         self.btn9.set_sensitive(state)
         self.btn4.set_sensitive(state)
+        self.btn10.set_sensitive(state)
 
 # =========================================================================================================
 #			                       FUNCTIONS Section
