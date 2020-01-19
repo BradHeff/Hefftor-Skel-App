@@ -112,6 +112,52 @@ you want to apply from <span foreground='cyan' weight='bold'>/etc/skel</span> to
         self.listview2.add(self.listRow2)
 
         # ===========================================
+        #				MENU A Section
+        # ===========================================
+        self.listview1a = Gtk.ListBox()
+        self.listview1a.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.hvbox.pack_start(self.listview1a, True, True, 0)
+
+        # ListRow 1
+        self.listRow1a = Gtk.ListBoxRow()
+        self.listRowTitle = Gtk.ListBoxRow()
+        self.hbox1a = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.listRow1a.add(self.hbox1a)
+
+        # ListRow 1 Elements
+        self.label1a = Gtk.Label(xalign=0)
+        self.label1a.set_line_wrap(True)
+        self.label1a.set_markup(
+            "Or now you have the option to manually navigate to the file or folder you wish to <span foreground='cyan' weight='bold'>Skel</span> \n\
+Simply click on <span foreground='cyan' weight='bold'>manual</span> radio button and select from the buttons below the textbox if you wish to skel a file or folder.\
+\nSee image below.")
+
+        self.hbox1a.pack_start(self.label1a, False, False, 0)
+        self.listview1a.add(self.listRow1a)
+        # ===========================================
+        #				Example #2 Section
+        # ===========================================
+
+        self.listview2a = Gtk.ListBox()
+        self.listview2a.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.hvbox.pack_start(self.listview2a, True, True, 0)
+
+        # ListRow 2
+        self.listRow2a = Gtk.ListBoxRow()
+        self.hbox2a = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.listRow2a.add(self.hbox2a)
+
+        # ListRow 2 Elements
+        self.image1a = Gtk.Image()
+        self.image1a.set_from_file(
+            os.path.join(base_dir, 'images/ex1.1.png'))
+
+        self.hbox2a.pack_start(self.image1a, False, False, 0)
+        self.listview2a.add(self.listRow2a)
+
+        # ===========================================
         #				Example #3 Section
         # ===========================================
         self.listview3 = Gtk.ListBox()
@@ -136,8 +182,12 @@ you want to apply from <span foreground='cyan' weight='bold'>/etc/skel</span> to
         self.label3 = Gtk.Label(xalign=0)
         self.label3.set_line_wrap(True)
         self.label3.set_markup(
-            "Now that we have our category from the dropdown menu selected, its time we run the application. \
-Click <span foreground='cyan' weight='bold'>Run Skel</span> button to apply the dotfiles from \
+            "Now that we have our category from the dropdown menu selected or we have navigated \
+to the file or folder using the <span foreground='cyan' weight='bold'>manual</span> option, its time we run the application. \
+\nBut first we have a toggle button above the <span foreground='cyan' weight='bold'>Run Skel</span> button, this will offer \
+you the freedom to choose if you wish to run backup before the files are copied from \
+<span foreground='cyan' weight='bold'>/etc/skel/</span> to your home directory.\n\
+Now we can click <span foreground='cyan' weight='bold'>Run Skel</span> button to apply the dotfiles from \
 <span foreground='cyan' weight='bold'>/etc/skel</span> to your home directory")
 
         self.hboxTitle2.pack_start(self.labelTitle2, False, False, 0)
@@ -193,9 +243,11 @@ Click <span foreground='cyan' weight='bold'>Run Skel</span> button to apply the 
         self.label5.set_markup(
             "When the application is opened and you click <span foreground='cyan' weight='bold'>Run Skel</span> \
 for the first time. The application will do a full backup of <span foreground='cyan' weight='bold'>.config, \
-.local, .conkyrc and .bashrc</span>. The backups are listed in the backup section of the application.\n\
-After selecting a backup from the dropdown list, Clicking <span foreground='cyan' weight='bold'>Delete\
-</span> button will remove all backups contained within the backup directory for that hour.\n\
+.local, .conkyrc and .bashrc</span> if you have the <span foreground='cyan' weight='bold'>Run Backup toggle enabled</span>.\
+The backups are listed in the backup section of the application. After selecting a backup from the dropdown list, \
+you will see the second dropdown below the first populated with the backups contained in the main backup directory \
+Clicking <span foreground='cyan' weight='bold'>Delete</span> button will remove the selected folder/file within the \
+dropdown on the buttons row.\n\
 <span foreground='cyan' weight='bold' size='large' stretch='semiexpanded'><u>EXAMPLE</u></span>\n\
 <b>Backup-2020-01-15 23</b>\n2020-01-15 = the date of the backup\n23 = the hour of the \
 backup\nSo every backup made within that hour will be placed in that folder.")

@@ -451,6 +451,7 @@ def run(self, cat):
                 if os.path.isfile(old):
                     shutil.copy(old, new)
         else:
+            self.ecode = 0
             old = cat.replace(" \'", "").replace("\'","").replace("[","").replace("]","")
             new = old.replace("/etc/skel",home)
             if os.path.isdir(old):

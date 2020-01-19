@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import Functions
 import Help
-import ImageX
 
 import threading
 import datetime
@@ -52,6 +51,7 @@ class HSApp(Gtk.Window):
         # self.connect("check_resize", self.on_check_resize)
         self.firstrun = 0
         self.ecode = 0
+        self.browser = 0
 
         hb = Gtk.HeaderBar()
         hb.props.show_close_button = True
@@ -332,11 +332,15 @@ class HSApp(Gtk.Window):
             self.browse.set_sensitive(True)
             self.rbutton3.set_sensitive(True)
             self.rbutton4.set_sensitive(True)
+            self.cat.set_sensitive(False)
+            self.browser = 1
         else:
             self.textBox.set_sensitive(False)
             self.rbutton3.set_sensitive(False)
             self.rbutton4.set_sensitive(False)
             self.browse.set_sensitive(False)
+            self.cat.set_sensitive(True)
+            self.browser = 0
 
     def on_browse_fixed(self, widget):
         if self.rbutton3.get_active():
@@ -430,14 +434,14 @@ class HSApp(Gtk.Window):
 
         Functions.setMessage(self, "Upgrading Bashrc")
 
+        if os.path.isfile("/etc/skel/.inputrc-latest"):
+            shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc")
+            shutil.copy("/etc/skel/.inputrc-latest",
+                        home + "/.inputrc-latest")
+
         if os.path.isfile("/etc/skel/.bashrc-latest"):
             shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
             shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc-latest")
-
-            if os.path.isfile("/etc/skel/.inputrc-latest"):
-                shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc")
-                shutil.copy("/etc/skel/.inputrc-latest",
-                            home + "/.inputrc-latest")
 
             Functions.setMessage(self, ".bashrc upgrade done")
             Functions.callBox(self, "bashrc upgraded", "Success!!")
@@ -467,12 +471,13 @@ class HSApp(Gtk.Window):
         if passes == True:
 
             self.button_toggles(False)
-            if self.switch.get_active():
+            if self.switch.get_active() and self.firstrun == 0:                
                 Functions.setMessage(self, "Running Backup")
                 t1 = threading.Thread(target=Functions.processing,
-                                      args=(self, text,))
+                                    args=(self, text,))
                 t1.daemon = True
                 t1.start()
+                self.firstrun = 1
             else:
                 Functions.run(self, text)
         else:
@@ -487,6 +492,8 @@ class HSApp(Gtk.Window):
         self.btn9.set_sensitive(state)
         self.btn4.set_sensitive(state)
         self.btn10.set_sensitive(state)
+        if self.browser == 1:
+            self.browse.set_sensitive(state)
 
 # =========================================================================================================
 #			                       FUNCTIONS Section
