@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import Functions
 import Help
-
+import re
 import threading
 import datetime
 import signal
@@ -201,11 +201,13 @@ class HSApp(Gtk.Window):
         self.backs_inner.set_active(0)
         self.backs_inner.set_size_request(170, 0)
         self.btn10 = Gtk.Button(label="Delete")
+        self.btn11 = Gtk.Button(label="Restore")
 
         self.btn4.connect("clicked", self.on_refresh_clicked)
         self.btn5.connect("clicked", self.on_delete_clicked)
         self.btn9.connect("clicked", self.on_flush_clicked)
         self.btn10.connect("clicked", self.on_delete_inner_clicked)
+        self.btn11.connect("clicked", self.on_restore_inner_clicked)
 
         self.label4 = Gtk.Label(xalign=0)
         self.label4.set_markup("<b>Delete Backups</b>")
@@ -217,6 +219,7 @@ class HSApp(Gtk.Window):
 
         self.hbox10.pack_start(self.backs_inner, True, True, 0)
         self.hbox10.pack_start(self.btn10, False, False, 0)
+        self.hbox10.pack_start(self.btn11, False, False, 0)
 
         self.hbox9.pack_start(self.btn9, True, True, 0)
         # self.hbox10.pack_start(self.btn9, True, True, 0)
@@ -375,6 +378,15 @@ class HSApp(Gtk.Window):
         w.show_all()
 
     # ===========================================
+    #			RESTORE BACKUP Section
+    # ===========================================
+    def on_restore_inner_clicked(self, widget):
+        self.button_toggles(False)
+        t1 = threading.Thread(
+            target=Functions.restore_inner, args=(self,))
+        t1.daemon = True
+        t1.start()
+    # ===========================================
     #			DELETE BACKUP Section
     # ===========================================
 
@@ -406,14 +418,26 @@ class HSApp(Gtk.Window):
     # ===========================================
 
     def on_flush_clicked(self, widget):
-        self.button_toggles(False)
-        t1 = threading.Thread(target=Functions.Flush_All, args=(self,))
-        t1.daemon = True
-        t1.start()
+        md = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.INFO,
+                               buttons=Gtk.ButtonsType.YES_NO, text="Are you Sure?")
+        md.format_secondary_markup(
+            "Are you sure you want to delete all your backups?")
+
+        result = md.run()
+
+        md.destroy()
+
+        if result in (Gtk.ResponseType.OK, Gtk.ResponseType.YES):
+            self.button_toggles(False)
+            t1 = threading.Thread(target=Functions.Flush_All, args=(self,))
+            t1.daemon = True
+            t1.start()
+        
 
     # ===========================================
     #			UPGRADE BASHRC Section
     # ===========================================
+
     def on_bashrc_skel_clicked(self, widget):
         self.button_toggles(False)
         now = datetime.datetime.now()
@@ -471,10 +495,10 @@ class HSApp(Gtk.Window):
         if passes == True:
 
             self.button_toggles(False)
-            if self.switch.get_active() and self.firstrun == 0:                
+            if self.switch.get_active() and self.firstrun == 0:
                 Functions.setMessage(self, "Running Backup")
                 t1 = threading.Thread(target=Functions.processing,
-                                    args=(self, text,))
+                                      args=(self, text,))
                 t1.daemon = True
                 t1.start()
                 self.firstrun = 1
@@ -492,6 +516,7 @@ class HSApp(Gtk.Window):
         self.btn9.set_sensitive(state)
         self.btn4.set_sensitive(state)
         self.btn10.set_sensitive(state)
+        self.btn11.set_sensitive(state)
         if self.browser == 1:
             self.browse.set_sensitive(state)
 

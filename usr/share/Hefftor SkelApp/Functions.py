@@ -1,5 +1,5 @@
 import Hefftor_SkelApp
-from Hefftor_SkelApp import os,home,bd,datetime,GLib,shutil,Gtk
+from Hefftor_SkelApp import os,home,bd,datetime,GLib,shutil,Gtk,re
 
 
 def setMessage(self, message):
@@ -105,6 +105,38 @@ def refresh_inner(self):
         self.backs_inner.get_model().clear()
         BACKUPS_FOLDER = []
 
+def restore_inner(self):
+    text = str(self.backs_inner.get_active_text())
+
+    if text.__len__() > 0:
+        path = home + "/" + bd + "/" + str(self.backs.get_active_text())
+        regex = re.search(r'([\-\_].*)', text, re.IGNORECASE)
+        
+        
+        GLib.idle_add(setMessage,self, "Restoring "  + text.replace(regex.group(0), ""))
+        GLib.idle_add(setProgress, self, 0.1)
+        if os.path.isfile(path + "/" + text):
+            shutil.copy(path + "/" + text, home + "/" + text.replace(regex.group(0), ""))
+        
+        if os.path.isdir(path + "/" + text):
+            count = os.listdir(path + "/" + text).__len__()
+
+            if count > 0:
+                count = ((count/count)/count)
+                for folder in os.listdir(path + "/" + text):
+                    if os.path.isdir(path + "/" + text + "/" + folder):
+                        # print(home + "/" + text.replace(regex.group(0), "") + "/" + folder)
+                        copytree(self, path + "/" + text + "/" + folder, home + "/" + text.replace(regex.group(0), "") + "/" + folder, True)
+                    if os.path.isfile(path + "/" + text + "/" + folder):
+                        shutil.copy(path + "/" + text + "/" + folder, home + "/" + text.replace(regex.group(0), "") + "/" + folder)
+                    GLib.idle_add(setProgress, self, self.progressbar.get_fraction() + count)
+                print(count)
+
+        GLib.idle_add(setProgress, self, 1)
+        GLib.idle_add(callBox,self, "Restore Complete", "Success!!")
+        GLib.idle_add(setProgress, self, 0)
+        GLib.idle_add(self.button_toggles, True)
+        GLib.idle_add(setMessage,self, "Idle...")
 # ===========================================
 #		MESSAGEBOX FUNCTION
 # ===========================================
@@ -120,6 +152,8 @@ def callBox(self, message, title):
     md.run()
     md.destroy()
     # self.set_sensitive(True)
+
+
 
 # ===========================================
 #		SHUTIL COPY_TREE FUNCTION
@@ -168,8 +202,8 @@ def processing(self, active_text):
         #       CONFIG
         # ============================
         
-        copytree(self, home + '/.config', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.config_backup-' +
-                 now.strftime("%Y-%m-%d %H:%M:%S"))
+        copytree(self, home + '/.config', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.config-backup-' +
+                 now.strftime("%Y-%m-%d %H:%M:%S"), True)
 
         GLib.idle_add(setProgress, self, 0.3)
 
@@ -177,8 +211,8 @@ def processing(self, active_text):
         #       LOACAL
         # ============================
 
-        copytree(self, home + '/.local', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.local_backup-' +
-                 now.strftime("%Y-%m-%d %H:%M:%S"))
+        copytree(self, home + '/.local', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.local-backup-' +
+                 now.strftime("%Y-%m-%d %H:%M:%S"), True)
         GLib.idle_add(setProgress, self, 0.5)
 
         # ============================
@@ -192,8 +226,8 @@ def processing(self, active_text):
         #       CONKY
         # ============================
         if os.path.exists(home + '/.lua'):
-            copytree(self, home + '/.lua', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.lua_backup-' +
-                    now.strftime("%Y-%m-%d %H:%M:%S"))
+            copytree(self, home + '/.lua', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.lua-backup-' +
+                    now.strftime("%Y-%m-%d %H:%M:%S"), True)
 
         if os.path.isfile(home + '/.conkyrc'):
             shutil.copy(
@@ -224,7 +258,7 @@ def run(self, cat):
             self.ecode = 1
         else:
             copytree(self, src,
-                                home + '/.config/polybar/')
+                                home + '/.config/polybar/', True)
             print("Path copied")
  
     
@@ -237,8 +271,7 @@ def run(self, cat):
         if not os.path.exists(src):
             self.ecode = 1
         else:
-            copytree(self, src, home + '/.config/herbstluftwm/',
-                                )
+            copytree(self, src, home + '/.config/herbstluftwm/', True)
             print("Path copied")
 
     # ===========================================
@@ -250,8 +283,7 @@ def run(self, cat):
         if not os.path.exists(src):
             self.ecode = 1
         else:
-            copytree(self, src, home + '/.config/bspwm/'
-                                )
+            copytree(self, src, home + '/.config/bspwm/', True)
             print("Path copied")
 
     # ===========================================
@@ -264,7 +296,7 @@ def run(self, cat):
         if not os.path.exists(src1):
             self.ecode = 1
         else:
-            copytree(self, src1, home + '/.cache/i3lock')
+            copytree(self, src1, home + '/.cache/i3lock', True)
 
     # ===========================================
     #		ROOT
@@ -299,7 +331,7 @@ def run(self, cat):
             
             for filename in os.listdir(src2):
                 if os.path.exists(src2 + "/" + filename) and filename != "xfce4":
-                    copytree(self, src2 + "/" + filename, home + '/.local/share/' + filename)
+                    copytree(self, src2 + "/" + filename, home + '/.local/share/' + filename, True)
 
         print(".local copied")
     
@@ -313,7 +345,7 @@ def run(self, cat):
         if not os.path.exists(src1) or not os.path.isfile(src2):
             self.ecode = 1
         else:
-            copytree(self, src1, home + '/.lua')
+            copytree(self, src1, home + '/.lua', True)
             shutil.copy(src2, home + '/.conkyrc')
 
         print("Conky copied")
@@ -327,8 +359,7 @@ def run(self, cat):
         if not os.path.exists(src1):
             self.ecode = 1
         else:
-            copytree(self, src1, home + '/.config/dconf'
-                                )
+            copytree(self, src1, home + '/.config/dconf', True)
 
         print(".local copied")
 
@@ -341,8 +372,7 @@ def run(self, cat):
         if not os.path.exists(src1):
             self.ecode = 1
         else:
-            copytree(self, src1, home + '/.config/rofi'
-                                )
+            copytree(self, src1, home + '/.config/rofi', True)
 
         print("rofi copied")
 
@@ -358,7 +388,7 @@ def run(self, cat):
             for folder in os.listdir(src1):
                 if os.path.isdir(src1 + "/" + folder):
                     copytree(
-                        self, src1 + "/" + folder, home + '/.config/variety/' + folder)
+                        self, src1 + "/" + folder, home + '/.config/variety/' + folder, True)
                 elif os.path.isfile(src1 + "/" + folder):
                     shutil.copy(src1 + "/" + folder,
                                 home + "/.config/variety/" + folder)
@@ -380,7 +410,7 @@ def run(self, cat):
             for folder in os.listdir(src1):
                 if os.path.isdir(src1 + "/" + folder):
                     copytree(
-                        self, src1 + "/" + folder, home + '/.config/xfce4/' + folder)
+                        self, src1 + "/" + folder, home + '/.config/xfce4/' + folder, True)
                 elif os.path.isfile(src1 + "/" + folder):
                     shutil.copy(src1 + "/" + folder,
                                 home + "/.config/xfce4/" + folder)
@@ -412,7 +442,7 @@ def run(self, cat):
         for item in list:                
             if os.path.isdir("/etc/skel/.config/" + item):
                 copytree(
-                    self, "/etc/skel/.config/" + item, home + '/.config/' + item)
+                    self, "/etc/skel/.config/" + item, home + '/.config/' + item, True)
 
             if os.path.isfile("/etc/skel/.config/" + item):
                 shutil.copy("/etc/skel/.config/" + item, home + "/.config/" + item)
@@ -433,7 +463,7 @@ def run(self, cat):
             for item in list:                
                 if os.path.isdir("/etc/skel/.config/" + item):
                     copytree(
-                        self, "/etc/skel/.config/" + item, home + '/.config/' + item)
+                        self, "/etc/skel/.config/" + item, home + '/.config/' + item, True)
 
                 if os.path.isfile("/etc/skel/.config/" + item):
                     shutil.copy("/etc/skel/.config/" + item, home + "/.config/" + item)
