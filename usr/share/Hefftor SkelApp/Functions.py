@@ -11,6 +11,65 @@ def setProgress(self, value):
 
 
 # ===========================================
+#		UPGRADE ZSHRC FUNCTION
+# ===========================================
+def upgrade_zsh(self):
+    now = datetime.datetime.now()
+    GLib.idle_add(setMessage,self, "Running Backup")
+
+    if not os.path.exists(home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H")):
+        os.makedirs(home + "/" + bd + "/Backup-" +
+                    now.strftime("%Y-%m-%d %H"))
+
+    if os.path.isfile(home + '/.zshrc'):
+        shutil.copy(
+            home + '/.zshrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
+            now.strftime("%Y-%m-%d %H:%M:%S"))
+
+
+# ===========================================
+#		UPGRADE BASHRC FUNCTION
+# ===========================================
+def bash_upgrade(self):
+    now = datetime.datetime.now()
+    GLib.idle_add(setMessage,self, "Running Backup")
+
+    if not os.path.exists(home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H")):
+        os.makedirs(home + "/" + bd + "/Backup-" +
+                    now.strftime("%Y-%m-%d %H"))
+
+    if os.path.isfile(home + '/.bashrc'):
+        shutil.copy(
+            home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
+            now.strftime("%Y-%m-%d %H:%M:%S"))
+
+    if os.path.isfile(home + '/.inputrc'):
+        shutil.copy(
+            home + '/.inputrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.inputrc-backup-" +
+            now.strftime("%Y-%m-%d %H:%M:%S"))
+
+    GLib.idle_add(setMessage,self, "Upgrading Bashrc")
+
+    if os.path.isfile("/etc/skel/.inputrc-latest"):
+        shutil.copy("/etc/skel/.inputrc-latest", home + "/.inputrc")
+        shutil.copy("/etc/skel/.inputrc-latest",
+                    home + "/.inputrc-latest")
+
+    if os.path.isfile("/etc/skel/.bashrc-latest"):
+        shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
+        shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc-latest")
+
+        GLib.idle_add(setMessage,self, ".bashrc upgrade done")
+        GLib.idle_add(callBox,self, "bashrc upgraded", "Success!!")
+    else:
+        GLib.idle_add(callBox,
+            self, "bashrc upgrade failed, you dont have a .bashrc-latest in skel", "Failed!!")
+
+    GLib.idle_add(setMessage,self, "Idle...")
+    GLib.idle_add(refresh,self)
+    GLib.idle_add(self.button_toggles,True)
+
+# ===========================================
 #		DELETE BACKUP FUNCTION
 # ===========================================
 def Delete_Backup(self):

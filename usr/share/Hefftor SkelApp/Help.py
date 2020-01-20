@@ -1,6 +1,7 @@
 import gi
 from gi.repository import Gtk, GdkPixbuf, GLib
 import os
+import Hefftor_SkelApp
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
