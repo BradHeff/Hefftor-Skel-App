@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import GUI
-import Help
 import Functions
+import Help
+import GUI
 import shutil
 from os.path import expanduser
 import signal
@@ -11,6 +11,8 @@ import re
 import os
 from gi.repository import Gtk, GdkPixbuf, GLib
 import gi
+
+
 gi.require_version('Gtk', '3.0')
 
 

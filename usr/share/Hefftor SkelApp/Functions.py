@@ -1,5 +1,6 @@
+import os
 import Hefftor_SkelApp
-from Hefftor_SkelApp import os,home,bd,datetime,GLib,shutil,Gtk,re
+from Hefftor_SkelApp import home,bd,datetime,GLib,shutil,Gtk,re
 
 
 def setMessage(self, message):
@@ -25,7 +26,20 @@ def upgrade_zsh(self):
         shutil.copy(
             home + '/.zshrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
             now.strftime("%Y-%m-%d %H:%M:%S"))
+    
+    if os.path.isfile("/etc/skel/.zshrc-latest"):
+        shutil.copy("/etc/skel/.zshrc-latest", home + "/.zshrc")
+        shutil.copy("/etc/skel/.zshrc-latest", home + "/.zshrc-latest")
 
+        GLib.idle_add(setMessage,self, ".zshrc upgrade done")
+        GLib.idle_add(callBox,self, "zshrc upgraded", "Success!!")
+    else:
+        GLib.idle_add(callBox,
+            self, "zshrc upgrade failed, you dont have a .zshrc-latest in skel", "Failed!!")
+
+    GLib.idle_add(setMessage,self, "Idle...")
+    GLib.idle_add(refresh,self)
+    GLib.idle_add(self.button_toggles,True)
 
 # ===========================================
 #		UPGRADE BASHRC FUNCTION
