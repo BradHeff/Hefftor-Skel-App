@@ -290,9 +290,18 @@ def processing(self, active_text):
         # ============================
         #       BASH
         # ============================
-        shutil.copy(
-            home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
-            now.strftime("%Y-%m-%d %H:%M:%S"))
+        if os.path.isfile(home + '/.bashrc'):
+            shutil.copy(
+                home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
+                now.strftime("%Y-%m-%d %H:%M:%S"))
+        
+        # ============================
+        #       ZSH
+        # ============================
+        if os.path.isfile(home + '/.zshrc'):
+            shutil.copy(
+                home + '/.zshrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.zshrc-backup-" +
+                now.strftime("%Y-%m-%d %H:%M:%S"))
 
         # ============================
         #       CONKY
