@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import GUI
+import Help
 import Functions
 import shutil
 from os.path import expanduser
@@ -7,8 +9,6 @@ import datetime
 import threading
 import re
 import os
-import Help
-import GUI
 from gi.repository import Gtk, GdkPixbuf, GLib
 import gi
 gi.require_version('Gtk', '3.0')
