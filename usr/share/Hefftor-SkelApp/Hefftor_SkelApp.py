@@ -243,6 +243,7 @@ class HSApp(Gtk.Window):
         self.btn4.set_sensitive(state)
         self.btn10.set_sensitive(state)
         self.btn11.set_sensitive(state)
+        self.btn8.set_sensitive(state)
         if self.browser == 1:
             self.browse.set_sensitive(state)
             self.remove.set_sensitive(state)

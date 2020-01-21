@@ -575,17 +575,18 @@ def run(self, cat):
 
     else:
         count = cat.__len__()
-        prog = (count/count)/count
-        self.ecode = 0
-        for item in cat:
-            print(item[0])
-            GLib.idle_add(setProgress, self, prog)
-            old = item[0]
-            new = old.replace("/etc/skel",home)
-            if os.path.isdir(old):
-                copytree(self, old, new, True)
-            if os.path.isfile(old):
-                shutil.copy(old, new)
+        if(count > 0):
+            prog = (count/count)/count
+            self.ecode = 0
+            for item in cat:
+                print(item[0])
+                GLib.idle_add(setProgress, self, prog)
+                old = item[0]
+                new = old.replace("/etc/skel",home)
+                if os.path.isdir(old):
+                    copytree(self, old, new, True)
+                if os.path.isfile(old):
+                    shutil.copy(old, new)
         # if "," in cat:
         #     for filename in cat.split(','):
         #         old = filename.replace(" \'", "").replace("\'","").replace("[","").replace("]","")
