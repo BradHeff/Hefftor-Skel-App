@@ -22,11 +22,6 @@ BACKUPS_FOLDER = []
 
 bd = ".SkelApp_Backups"
 
-actresses = [('jessica alba', 'pomona', '1981'), ('sigourney weaver', 'new york', '1949'),
-             ('angelina jolie', 'los angeles',
-                 '1975'), ('natalie portman', 'jerusalem', '1981'),
-             ('rachel weiss', 'london', '1971'), ('scarlett johansson', 'new york', '1984')]
-
 
 class HSApp(Gtk.Window):
     def __init__(self):
