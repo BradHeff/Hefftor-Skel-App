@@ -39,7 +39,7 @@ def upgrade_zsh(self):
 
     if os.path.isfile(home + '/.zshrc'):
         shutil.copy(
-            home + '/.zshrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
+            home + '/.zshrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.zshrc-backup-" +
             now.strftime("%Y-%m-%d %H:%M:%S"))
     
     if os.path.isfile("/etc/skel/.zshrc"):
@@ -49,7 +49,7 @@ def upgrade_zsh(self):
         GLib.idle_add(callBox,self, "zshrc upgraded", "Success!!")
     else:
         GLib.idle_add(callBox,
-            self, "zshrc upgrade failed, you dont have a .zshrc-latest in skel", "Failed!!")
+            self, "zshrc upgrade failed, you dont have a .zshrc in skel", "Failed!!")
 
     source_shell(self)
 
