@@ -22,6 +22,11 @@ BACKUPS_FOLDER = []
 
 bd = ".SkelApp_Backups"
 
+actresses = [('jessica alba', 'pomona', '1981'), ('sigourney weaver', 'new york', '1949'),
+             ('angelina jolie', 'los angeles',
+                 '1975'), ('natalie portman', 'jerusalem', '1981'),
+             ('rachel weiss', 'london', '1971'), ('scarlett johansson', 'new york', '1984')]
+
 
 class HSApp(Gtk.Window):
     def __init__(self):
@@ -42,22 +47,47 @@ class HSApp(Gtk.Window):
 
 # ===========================================================================================================
 
+    def create_columns(self, treeView):
+
+        rendererText = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Name", rendererText, text=0)
+        column.set_sort_column_id(0)
+        self.treeView.append_column(column)
+
     def toggled_cb(self, button):
         if self.rbutton2.get_active():
-            self.textBox.set_sensitive(True)
+            self.treeView.set_sensitive(True)
             self.browse.set_sensitive(True)
             self.rbutton3.set_sensitive(True)
             self.rbutton4.set_sensitive(True)
             self.cat.set_sensitive(False)
+            self.remove.set_sensitive(True)
             self.browser = 1
         else:
-            self.textBox.set_sensitive(False)
+            self.treeView.set_sensitive(False)
             self.rbutton3.set_sensitive(False)
             self.rbutton4.set_sensitive(False)
             self.browse.set_sensitive(False)
+            self.remove.set_sensitive(False)
             self.cat.set_sensitive(True)
             self.browser = 0
 
+    # ===========================================
+    #		REMOVE ITEMS TO TREEVIEW Section
+    # ===========================================
+    def on_remove_fixed(self, widget):
+        selection = self.treeView.get_selection()
+        model, paths = selection.get_selected_rows()
+
+        # Get the TreeIter instance for each path
+        for path in paths:
+            iter = model.get_iter(path)
+            # Remove the ListStore row referenced by iter
+            model.remove(iter)
+
+    # ===========================================
+    #		ADD ITEMS TO TREEVIEW Section
+    # ===========================================
     def on_browse_fixed(self, widget):
         if self.rbutton3.get_active():
             dialog = Gtk.FileChooserDialog(
@@ -75,7 +105,10 @@ class HSApp(Gtk.Window):
 
         if response == Gtk.ResponseType.OK:
             foldername = dialog.get_filenames()
-            self.textBox.set_text(str(foldername))
+            for item in foldername:
+                self.store.append([item])
+
+            # self.textBox.set_text(str(foldername))
 
             dialog.destroy()
         elif response == Gtk.ResponseType.CANCEL:
@@ -177,16 +210,18 @@ class HSApp(Gtk.Window):
     #			RUN SKEL Section
     # ===========================================
     def on_button_fetch_clicked(self, widget):
-        passes = False
+        passes = True
 
         if not self.rbutton.get_active():
-            text = self.textBox.get_text()
+            # text = self.textBox.get_text()
 
-            if "/etc/skel" in text:
-                passes = True
+            text = self.treeView.get_model()
+            for item in text:
+                if not "/etc/skel" in item[0]:
+                    passes = False
+
         else:
             text = self.cat.get_active_text()
-            passes = True
 
         if passes == True:
 
@@ -215,6 +250,7 @@ class HSApp(Gtk.Window):
         self.btn11.set_sensitive(state)
         if self.browser == 1:
             self.browse.set_sensitive(state)
+            self.remove.set_sensitive(state)
 
 # =========================================================================================================
 #			                       FUNCTIONS Section

@@ -113,21 +113,41 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.rbutton4 = Gtk.RadioButton.new_from_widget(self.rbutton3)
     self.rbutton4.set_label("Folder")
 
-    self.browse = Gtk.Button(label=". . .")
+    self.browse = Gtk.Button(label="ADD")
     self.browse.connect("clicked", self.on_browse_fixed)
-    self.textBox = Gtk.Entry()
+
+    self.remove = Gtk.Button(label="REMOVE")
+    self.remove.connect("clicked", self.on_remove_fixed)
+    # self.textBox = Gtk.Entry()
+
+    self.vbuttons = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+
+    sw = Gtk.ScrolledWindow()
+    sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+    sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+
+    self.store = Gtk.ListStore(str)
+
+    self.treeView = Gtk.TreeView(self.store)
+    # treeView.connect("row-activated", self.on_activated)
+    self.treeView.set_rules_hint(True)
+    sw.set_size_request(270, 120)
+    sw.add(self.treeView)
+    self.create_columns(self.treeView)
 
     self.hbox1.pack_start(self.rbutton, False, False, 0)
     # self.hbox1.pack_start(self.label1, False, False, 0)
     self.hbox1.pack_end(self.cat, True, True, 0)
 
     self.hboxman.pack_start(self.rbutton2, False, False, 0)
-    self.hboxman.pack_start(self.textBox, True, True, 0)
-    self.hboxman.pack_start(self.browse, False, False, 0)
+    self.hboxman.pack_start(sw, True, True, 0)
+    self.hboxman.pack_start(self.vbuttons, False, False, 0)
 
     self.hboxchoose.pack_start(self.rbutton3, True, False, 0)
     self.hboxchoose.pack_start(self.rbutton4, True, False, 0)
 
+    self.vbuttons.pack_start(self.browse, False, False, 0)
+    self.vbuttons.pack_start(self.remove, False, False, 0)
     self.listview1.add(self.listRow1)
 
     # ===========================================
@@ -297,7 +317,8 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.hbox3.pack_start(self.label3, True, False, 0)
     self.listview3.add(self.listRow3)
 
-    self.textBox.set_sensitive(False)
+    self.treeView.set_sensitive(False)
     self.browse.set_sensitive(False)
+    self.remove.set_sensitive(False)
     self.rbutton3.set_sensitive(False)
     self.rbutton4.set_sensitive(False)

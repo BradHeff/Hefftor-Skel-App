@@ -1,7 +1,7 @@
 import os
 import Hefftor_SkelApp
 from Hefftor_SkelApp import home,bd,datetime,GLib,shutil,Gtk,re
-
+import subprocess
 
 def setMessage(self, message):
     self.label4.set_markup("<i>" + message + "</i>")
@@ -10,6 +10,21 @@ def setMessage(self, message):
 def setProgress(self, value):
     self.progressbar.set_fraction(value)
 
+
+# ===========================================
+#		SOURCE FUNCTION
+# ===========================================
+def source_shell(self):
+    process = subprocess.run(["sh", "-c", "echo \"$SHELL\""], 
+                         stdout=subprocess.PIPE)
+    
+    output = process.stdout.decode().rstrip()
+    print(output)
+    if output == "/bin/bash":
+        subprocess.run(["bash", "-c", "source " + home + "/.bashrc"], stdout=subprocess.PIPE)
+    elif output == "/bin/zsh":
+        subprocess.run(["zsh", "-c", "source " + home + "/.zshrc"], stdout=subprocess.PIPE)
+        
 
 # ===========================================
 #		UPGRADE ZSHRC FUNCTION
@@ -36,6 +51,8 @@ def upgrade_zsh(self):
         GLib.idle_add(callBox,
             self, "zshrc upgrade failed, you dont have a .zshrc-latest in skel", "Failed!!")
 
+    source_shell(self)
+
     GLib.idle_add(setMessage,self, "Idle...")
     GLib.idle_add(refresh,self)
     GLib.idle_add(self.button_toggles,True)
@@ -44,6 +61,7 @@ def upgrade_zsh(self):
 #		UPGRADE BASHRC FUNCTION
 # ===========================================
 def bash_upgrade(self):
+            
     now = datetime.datetime.now()
     GLib.idle_add(setMessage,self, "Running Backup")
 
@@ -72,15 +90,19 @@ def bash_upgrade(self):
         shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc")
         shutil.copy("/etc/skel/.bashrc-latest", home + "/.bashrc-latest")
 
+        
         GLib.idle_add(setMessage,self, ".bashrc upgrade done")
         GLib.idle_add(callBox,self, "bashrc upgraded", "Success!!")
     else:
         GLib.idle_add(callBox,
             self, "bashrc upgrade failed, you dont have a .bashrc-latest in skel", "Failed!!")
 
+    source_shell(self)
+
     GLib.idle_add(setMessage,self, "Idle...")
     GLib.idle_add(refresh,self)
     GLib.idle_add(self.button_toggles,True)
+
 
 # ===========================================
 #		DELETE BACKUP FUNCTION
@@ -552,33 +574,45 @@ def run(self, cat):
             print("hlwm-config copied")
 
     else:
-        if "," in cat:
-            for filename in cat.split(','):
-                old = filename.replace(" \'", "").replace("\'","").replace("[","").replace("]","")
-                
-                new = old.replace("/etc/skel",home)
-                if os.path.isdir(old):
-                    copytree(self, old, new, True)
-                if os.path.isfile(old):
-                    shutil.copy(old, new)
-        else:
-            self.ecode = 0
-            old = cat.replace(" \'", "").replace("\'","").replace("[","").replace("]","")
+        count = cat.__len__()
+        prog = (count/count)/count
+        self.ecode = 0
+        for item in cat:
+            print(item[0])
+            GLib.idle_add(setProgress, self, prog)
+            old = item[0]
             new = old.replace("/etc/skel",home)
             if os.path.isdir(old):
                 copytree(self, old, new, True)
             if os.path.isfile(old):
                 shutil.copy(old, new)
+        # if "," in cat:
+        #     for filename in cat.split(','):
+        #         old = filename.replace(" \'", "").replace("\'","").replace("[","").replace("]","")
+                
+        #         new = old.replace("/etc/skel",home)
+        #         if os.path.isdir(old):
+        #             copytree(self, old, new, True)
+        #         if os.path.isfile(old):
+        #             shutil.copy(old, new)
+        # else:
+        #     self.ecode = 0
+        #     old = cat.replace(" \'", "").replace("\'","").replace("[","").replace("]","")
+        #     new = old.replace("/etc/skel",home)
+        #     if os.path.isdir(old):
+        #         copytree(self, old, new, True)
+        #     if os.path.isfile(old):
+        #         shutil.copy(old, new)
             
         
         
 
-    setProgress(self,1)
+    GLib.idle_add(setProgress,self,1)
     if(self.ecode == 1):
-        callBox(self, "Cant seem to find that source. Have you got it installed?", "Success!!")
+        GLib.idle_add(callBox,self, "Cant seem to find that source. Have you got it installed?", "Success!!")
     else:
-        callBox(self, "Skel executed successfully.", "Success!!")
+        GLib.idle_add(callBox,self, "Skel executed successfully.", "Success!!")
 
-    setProgress(self,0)
-    self.button_toggles(True)
-    setMessage(self, "Idle...")
+    GLib.idle_add(setProgress,self,0)
+    GLib.idle_add(self.button_toggles,True)
+    GLib.idle_add(setMessage,self, "Idle...")
