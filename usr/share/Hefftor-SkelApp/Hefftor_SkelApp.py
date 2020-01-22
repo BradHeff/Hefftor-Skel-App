@@ -34,7 +34,6 @@ class HSApp(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect("delete-event", Gtk.main_quit)
         # self.connect("check_resize", self.on_check_resize)
-        self.firstrun = 0
         self.ecode = 0
         self.browser = 0
 
@@ -221,13 +220,12 @@ class HSApp(Gtk.Window):
         if passes == True:
 
             self.button_toggles(False)
-            if self.switch.get_active() and self.firstrun == 0:
+            if self.switch.get_active():
                 Functions.setMessage(self, "Running Backup")
                 t1 = threading.Thread(target=Functions.processing,
                                       args=(self, text,))
                 t1.daemon = True
                 t1.start()
-                self.firstrun = 1
             else:
                 Functions.run(self, text)
         else:
