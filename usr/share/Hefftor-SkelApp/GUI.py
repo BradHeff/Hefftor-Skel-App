@@ -58,7 +58,7 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.listRowHDR.add(self.hboxHDR)
 
     self.pixbuf = GdkPixbuf.Pixbuf().new_from_file_at_size(
-        os.path.join(base_dir, 'images/logo1.png'), 300, 50)
+        os.path.join(base_dir, 'images/logo1.png'), 85, 85)
     self.image = Gtk.Image().new_from_pixbuf(self.pixbuf)
     # self.connect('check_resize', self.on_image_resize)
 
@@ -70,12 +70,38 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.hboxHDR.pack_start(self.btnhelp, True, True, 0)
     self.listviewHDR.add(self.listRowHDR)
 
+    #==========================================================
+    #                    INITIALIZE STACK
+    #==========================================================
+
+    stack = Gtk.Stack()
+    stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
+    stack.set_transition_duration(500)
+    
+    self.vboxStack1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+    self.vboxStack2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+
+    stack_switcher = Gtk.StackSwitcher()
+    stack_switcher.set_orientation(Gtk.Orientation.HORIZONTAL)
+    stack_switcher.set_stack(stack)
+    stack_switcher.set_homogeneous(True)
+    # grid.attach(stack_switcher, 0, 0, 1, 10)
+    # grid.attach(stack, 1, 0, 2, 10)
+    self.vbox.pack_start(stack_switcher, False, True, 0)
+    self.vbox.pack_start(stack, True, True, 0)
+
+    #==========================================================
+    #                       TAB #1
+    #==========================================================
+    
+    stack.add_titled(self.vboxStack1, "stack1", "Main")
+
     # ===========================================
     #				MENU Section
     # ===========================================
     self.listview1 = Gtk.ListBox()
     self.listview1.set_selection_mode(Gtk.SelectionMode.NONE)
-    self.vbox.pack_start(self.listview1, True, True, 0)
+    self.vboxStack1.pack_start(self.listview1, True, True, 0)
 
     # ListRow 1
     self.listRow1 = Gtk.ListBoxRow()
@@ -150,12 +176,23 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.vbuttons.pack_start(self.remove, False, False, 0)
     self.listview1.add(self.listRow1)
 
+
+
+    #==========================================================
+    #                       TAB #2
+    #==========================================================
+    stack.add_titled(self.vboxStack2, "stack2", "Backups")
+
+    
+
+
+
     # ===========================================
     #				BACKUPS Section
     # ===========================================
     self.listview4 = Gtk.ListBox()
     self.listview4.set_selection_mode(Gtk.SelectionMode.NONE)
-    self.vbox.pack_start(self.listview4, True, True, 0)
+    self.vboxStack2.pack_start(self.listview4, True, True, 0)
 
     # ListRow 1
     self.listRow4 = Gtk.ListBoxRow()
