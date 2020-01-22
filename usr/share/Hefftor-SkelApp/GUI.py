@@ -170,6 +170,8 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
         orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
     self.hbox10 = Gtk.Box(
         orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    self.vbox11 = Gtk.Box(
+        orientation=Gtk.Orientation.VERTICAL, spacing=10)
     self.vboxDelete = Gtk.Box(
         orientation=Gtk.Orientation.VERTICAL, spacing=10)
 
@@ -185,10 +187,23 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.btn5 = Gtk.Button(label="Delete")
     self.btn9 = Gtk.Button(label="Clean All Backups")
 
-    self.backs_inner = Gtk.ComboBoxText()
+    sw2 = Gtk.ScrolledWindow()
+    sw2.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+    sw2.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+
+    self.store2 = Gtk.ListStore(str)
+
+    self.treeView2 = Gtk.TreeView(self.store2)
+    # treeView.connect("row-activated", self.on_activated)
+    self.treeView2.set_rules_hint(True)
+    sw2.set_size_request(270, 120)
+    sw2.add(self.treeView2)
+    self.create_columns(self.treeView2)
+
+    # self.backs_inner = Gtk.ComboBoxText()
     Functions.refresh_inner(self)
-    self.backs_inner.set_active(0)
-    self.backs_inner.set_size_request(170, 0)
+    # self.backs_inner.set_active(0)
+    # self.backs_inner.set_size_request(170, 0)
     self.btn10 = Gtk.Button(label="Delete")
     self.btn11 = Gtk.Button(label="Restore")
 
@@ -206,9 +221,11 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.hbox4.pack_start(self.btn4, False, False, 0)
     self.hbox4.pack_end(self.btn5, True, True, 0)
 
-    self.hbox10.pack_start(self.backs_inner, True, True, 0)
-    self.hbox10.pack_start(self.btn10, False, False, 0)
-    self.hbox10.pack_start(self.btn11, False, False, 0)
+    # self.hbox10.pack_start(self.backs_inner, True, True, 0)
+    self.hbox10.pack_start(sw2, True, True, 0)
+    self.hbox10.pack_start(self.vbox11, False, False, 0)
+    self.vbox11.pack_start(self.btn10, False, False, 0)
+    self.vbox11.pack_start(self.btn11, False, False, 0)
 
     self.hbox9.pack_start(self.btn9, True, True, 0)
     # self.hbox10.pack_start(self.btn9, True, True, 0)

@@ -122,17 +122,42 @@ def Delete_Backup(self):
     GLib.idle_add(self.button_toggles, True)
     GLib.idle_add(setProgress, self, 0)
 
+# def Delete_Inner_Backup(self):
+#     count = os.listdir(home + "/" + bd).__len__()
+
+#     if count > 0:
+#         GLib.idle_add(setProgress, self, 0.3)
+#         for filename in os.listdir(home + "/" + bd + "/" + self.backs.get_active_text()):
+#             if filename == self.backs_inner.get_active_text():
+#                 if os.path.isdir(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename):
+#                     shutil.rmtree(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename)
+#                 elif os.path.isfile(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename):
+#                     os.unlink(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename)
+#         GLib.idle_add(refresh_inner, self)
+#         GLib.idle_add(setProgress, self, 1)
+#         GLib.idle_add(callBox,self, "Config backups cleaned.", "Success!!")
+#     GLib.idle_add(self.button_toggles, True)
+#     GLib.idle_add(setProgress, self, 0)
+
 def Delete_Inner_Backup(self):
     count = os.listdir(home + "/" + bd).__len__()
 
     if count > 0:
         GLib.idle_add(setProgress, self, 0.3)
+        treeselect = self.treeView2.get_selection()
+        
         for filename in os.listdir(home + "/" + bd + "/" + self.backs.get_active_text()):
-            if filename == self.backs_inner.get_active_text():
-                if os.path.isdir(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename):
-                    shutil.rmtree(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename)
-                elif os.path.isfile(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename):
-                    os.unlink(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename)
+            (model, pathlist) = treeselect.get_selected_rows()
+            for path in pathlist :
+                tree_iter = model.get_iter(path)
+                value = model.get_value(tree_iter,0)
+                if filename == value:
+                    # print(value)
+                    if os.path.isdir(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename):
+                        shutil.rmtree(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename)
+                    elif os.path.isfile(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename):
+                        os.unlink(home + "/" + bd + "/" + self.backs.get_active_text() + "/" + filename)
+            
         GLib.idle_add(refresh_inner, self)
         GLib.idle_add(setProgress, self, 1)
         GLib.idle_add(callBox,self, "Config backups cleaned.", "Success!!")
@@ -181,27 +206,47 @@ def refresh(self):
 
     self.backs.set_active(0)
     
+# def refresh_inner(self):
+#     count = os.listdir(home + "/" + bd).__len__()
+#     active_text = "".join([str(self.backs.get_active_text()), ""])
+
+#     if count > 0:
+#         if os.path.isdir(home + "/" + bd + "/" + active_text):
+#             self.backs_inner.get_model().clear()
+#             BACKUPS_FOLDER = []
+#             for filename in os.listdir(home + "/" + bd + "/" + active_text):
+#                 BACKUPS_FOLDER.append(filename)
+#             for item in BACKUPS_FOLDER:
+#                 self.backs_inner.append_text(item)
+
+#             self.backs_inner.set_active(0)
+#     else:
+#         self.backs_inner.get_model().clear()
+#         BACKUPS_FOLDER = []
+
+
 def refresh_inner(self):
     count = os.listdir(home + "/" + bd).__len__()
     active_text = "".join([str(self.backs.get_active_text()), ""])
 
     if count > 0:
         if os.path.isdir(home + "/" + bd + "/" + active_text):
-            self.backs_inner.get_model().clear()
-            BACKUPS_FOLDER = []
+            self.store2.clear()
+            
             for filename in os.listdir(home + "/" + bd + "/" + active_text):
-                BACKUPS_FOLDER.append(filename)
-            for item in BACKUPS_FOLDER:
-                self.backs_inner.append_text(item)
-
-            self.backs_inner.set_active(0)
+                self.store2.append([filename])
+            
     else:
-        self.backs_inner.get_model().clear()
-        BACKUPS_FOLDER = []
+        self.store2 = []
 
 def restore_inner(self):
-    text = str(self.backs_inner.get_active_text())
-
+    # text = str(self.backs_inner.get_active_text())
+    treeselect = self.treeView2.get_selection()
+    (model, pathlist) = treeselect.get_selected_rows()
+    for path in pathlist :
+        tree_iter = model.get_iter(path)
+        value = model.get_value(tree_iter,0)
+    text = value
     if text.__len__() > 0:
         path = home + "/" + bd + "/" + str(self.backs.get_active_text())
         regex = re.search(r'([\-\_].*)', text, re.IGNORECASE)
@@ -225,7 +270,7 @@ def restore_inner(self):
                         shutil.copy(path + "/" + text + "/" + folder, home + "/" + text.replace(regex.group(0), "") + "/" + folder)
                     GLib.idle_add(setProgress, self, self.progressbar.get_fraction() + count)
                 print(count)
-
+        print(text)
         GLib.idle_add(setProgress, self, 1)
         GLib.idle_add(callBox,self, "Restore Complete", "Success!!")
         GLib.idle_add(setProgress, self, 0)

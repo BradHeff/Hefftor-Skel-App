@@ -9,11 +9,11 @@ import datetime
 import threading
 import re
 import os
-from gi.repository import Gtk, GdkPixbuf, GLib
 import gi
-
-
 gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, GdkPixbuf, GLib
+
+
 
 
 home = expanduser("~")
@@ -47,7 +47,7 @@ class HSApp(Gtk.Window):
         rendererText = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("Name", rendererText, text=0)
         column.set_sort_column_id(0)
-        self.treeView.append_column(column)
+        treeView.append_column(column)
 
     def toggled_cb(self, button):
         if self.rbutton2.get_active():
