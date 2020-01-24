@@ -13,7 +13,7 @@ import os
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GLib
-
+from time import sleep
 
 
 
@@ -38,17 +38,10 @@ class HSApp(Gtk.Window):
         # self.connect("check_resize", self.on_check_resize)
         self.ecode = 0
         self.browser = 0
-
-        splash = Splash.Splash()
-        splash.start()
-        Splash.sleep(3)
-        splash.window.destroy()
-       
     
         
         GUI.GUI(self, Gtk, GdkPixbuf, GLib)
-        self.show_all()
-
+        
 # ===========================================================================================================
 
     def create_columns(self, treeView):
@@ -324,11 +317,17 @@ class HSApp(Gtk.Window):
 
 
 def signal_handler(sig, frame):
-    print('\nYou pressed Ctrl+C!\nFreechoice Menu GUI is Closing.')
+    print('\nYou pressed Ctrl+C!\nHefftor SkelApp is Closing.')
     Gtk.main_quit(0)
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGINT, signal_handler)    
+    signal.signal(signal.SIGINT, signal_handler)
+    splash = Splash.Splash()
+    splash.start()
+    sleep(3)
+    splash.window.destroy()
+    
     w = HSApp()
+    w.show_all()
     Gtk.main()
