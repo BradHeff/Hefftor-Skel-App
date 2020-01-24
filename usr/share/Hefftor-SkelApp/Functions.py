@@ -333,61 +333,69 @@ def copytree(self, src, dst, symlinks=False, ignore=None):
 
 def processing(self, active_text):
     now = datetime.datetime.now()
-    if self.firstrun == 0:
+    
 
-        GLib.idle_add(setProgress, self, 0.1)
+    GLib.idle_add(setProgress, self, 0.1)
 
-        # ============================
-        #       CONFIG
-        # ============================
+    # ============================
+    #       CONFIG
+    # ============================
+    
+    copytree(self, home + '/.config', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.config-backup-' +
+                now.strftime("%Y-%m-%d %H:%M:%S"), True)
+
+    GLib.idle_add(setProgress, self, 0.3)
+
+    # ============================
+    #       LOACAL
+    # ============================
+
+    copytree(self, home + '/.local', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.local-backup-' +
+                now.strftime("%Y-%m-%d %H:%M:%S"), True)
+    GLib.idle_add(setProgress, self, 0.5)
+
+    # ============================
+    #       BASH
+    # ============================
+    if os.path.isfile(home + '/.bashrc'):
+        shutil.copy(
+            home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
+            now.strftime("%Y-%m-%d %H:%M:%S"))
+    
+    # ============================
+    #       ZSH
+    # ============================
+    if os.path.isfile(home + '/.zshrc'):
+        shutil.copy(
+            home + '/.zshrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.zshrc-backup-" +
+            now.strftime("%Y-%m-%d %H:%M:%S"))
+
+    # ============================
+    #       CONKY
+    # ============================
+    if os.path.exists(home + '/.lua'):
+        copytree(self, home + '/.lua', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.lua-backup-' +
+                now.strftime("%Y-%m-%d %H:%M:%S"), True)
+
+    if os.path.isfile(home + '/.conkyrc'):
+        shutil.copy(
+            home + '/.conkyrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.conkyrc-backup-" +
+            now.strftime("%Y-%m-%d %H:%M:%S"))
+
+    GLib.idle_add(setMessage, self, "Done")
+
+    
+    if not active_text == "BACKUP":
+        GLib.idle_add(setMessage, self, "Running Skel")
+        GLib.idle_add(setProgress, self, 0.8)
+        GLib.idle_add(run, self, active_text)
+    else:
+        GLib.idle_add(setProgress, self, 1)
+        GLib.idle_add(self.button_toggles,True)
+        GLib.idle_add(setMessage,self, "Idle...")
+        GLib.idle_add(setProgress,self,0)
         
-        copytree(self, home + '/.config', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.config-backup-' +
-                 now.strftime("%Y-%m-%d %H:%M:%S"), True)
 
-        GLib.idle_add(setProgress, self, 0.3)
-
-        # ============================
-        #       LOACAL
-        # ============================
-
-        copytree(self, home + '/.local', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.local-backup-' +
-                 now.strftime("%Y-%m-%d %H:%M:%S"), True)
-        GLib.idle_add(setProgress, self, 0.5)
-
-        # ============================
-        #       BASH
-        # ============================
-        if os.path.isfile(home + '/.bashrc'):
-            shutil.copy(
-                home + '/.bashrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.bashrc-backup-" +
-                now.strftime("%Y-%m-%d %H:%M:%S"))
-        
-        # ============================
-        #       ZSH
-        # ============================
-        if os.path.isfile(home + '/.zshrc'):
-            shutil.copy(
-                home + '/.zshrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.zshrc-backup-" +
-                now.strftime("%Y-%m-%d %H:%M:%S"))
-
-        # ============================
-        #       CONKY
-        # ============================
-        if os.path.exists(home + '/.lua'):
-            copytree(self, home + '/.lua', home + '/' + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + '/.lua-backup-' +
-                    now.strftime("%Y-%m-%d %H:%M:%S"), True)
-
-        if os.path.isfile(home + '/.conkyrc'):
-            shutil.copy(
-                home + '/.conkyrc', home + "/" + bd + "/Backup-" + now.strftime("%Y-%m-%d %H") + "/.conkyrc-backup-" +
-                now.strftime("%Y-%m-%d %H:%M:%S"))
-
-        self.firstrun = 1
-        GLib.idle_add(setMessage, self, "Done")
-
-    GLib.idle_add(setMessage, self, "Running Skel")
-    GLib.idle_add(setProgress, self, 0.8)
-    GLib.idle_add(run, self, active_text)
     GLib.idle_add(refresh, self)
 
 

@@ -22,7 +22,7 @@ class Splash(Thread):
         
         self.progress = Gtk.ProgressBar()
         box.pack_start(image, True, True, 0)
-        box.pack_start(self.progress, False, False, 0)
+        # box.pack_start(self.progress, False, False, 0)
         self.window.add(box)
 
     def run(self):

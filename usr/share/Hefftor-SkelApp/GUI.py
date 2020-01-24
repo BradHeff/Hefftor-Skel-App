@@ -206,7 +206,7 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.hbox5 = Gtk.Box(
         orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
     self.hbox9 = Gtk.Box(
-        orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        orientation=Gtk.Orientation.VERTICAL, spacing=10)
     self.hbox10 = Gtk.Box(
         orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
     self.vbox11 = Gtk.Box(
@@ -224,7 +224,9 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.backs.set_size_request(170, 0)
     self.btn4 = Gtk.Button(label="Refresh")
     self.btn5 = Gtk.Button(label="Delete")
+    self.btn12 = Gtk.Button(label="Run Full Backup")
     self.btn9 = Gtk.Button(label="Clean All Backups")
+    
 
     sw2 = Gtk.ScrolledWindow()
     sw2.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -249,6 +251,7 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.btn4.connect("clicked", self.on_refresh_clicked)
     self.btn5.connect("clicked", self.on_delete_clicked)
     self.btn9.connect("clicked", self.on_flush_clicked)
+    self.btn12.connect("clicked", self.on_backup_clicked)
     self.btn10.connect("clicked", self.on_delete_inner_clicked)
     self.btn11.connect("clicked", self.on_restore_inner_clicked)
 
@@ -267,6 +270,8 @@ def GUI(self, Gtk, GdkPixbuf, GLib):
     self.vbox11.pack_start(self.btn11, False, False, 0)
 
     self.hbox9.pack_start(self.btn9, True, True, 0)
+
+    self.hbox9.pack_start(self.btn12, True, True, 0)
     # self.hbox10.pack_start(self.btn9, True, True, 0)
 
     self.listview4.add(self.listRow5)

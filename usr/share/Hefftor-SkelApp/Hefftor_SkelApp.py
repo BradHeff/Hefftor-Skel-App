@@ -39,10 +39,15 @@ class HSApp(Gtk.Window):
         self.ecode = 0
         self.browser = 0
 
+        splash = Splash.Splash()
+        splash.start()
+        Splash.sleep(3)
+        splash.window.destroy()
+       
+    
         
-
         GUI.GUI(self, Gtk, GdkPixbuf, GLib)
-        
+        self.show_all()
 
 # ===========================================================================================================
 
@@ -128,6 +133,13 @@ class HSApp(Gtk.Window):
         print("CLOSE MAIN HELP WINDOW")
         self.btnhelp.set_sensitive(True)
 
+    def on_backup_clicked(self, widget):
+        self.button_toggles(False)
+        Functions.setMessage(self, "Running Backup")
+        t1 = threading.Thread(target=Functions.processing,
+                                args=(self, "BACKUP",))
+        t1.daemon = True
+        t1.start()
     # ===========================================
     #			RESTORE BACKUP Section
     # ===========================================
@@ -246,6 +258,7 @@ class HSApp(Gtk.Window):
         self.btn4.set_sensitive(state)
         self.btn10.set_sensitive(state)
         self.btn11.set_sensitive(state)
+        self.btn12.set_sensitive(state)
         self.btn8.set_sensitive(state)
         if self.browser == 1:
             self.browse.set_sensitive(state)
@@ -316,14 +329,6 @@ def signal_handler(sig, frame):
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)    
     w = HSApp()
-    splash = Splash.Splash()
-    splash.start()
-    for i in range(5):
-        splash.progress.set_fraction(splash.progress.get_fraction() + 0.2)
-        Splash.sleep(0.7)
-    splash.destroy()
-    
-    w.show_all()  
     Gtk.main()
