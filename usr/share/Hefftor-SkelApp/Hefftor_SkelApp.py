@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import Splash
 import Functions
 import Help
 import GUI
@@ -32,12 +33,16 @@ class HSApp(Gtk.Window):
         self.set_icon_from_file(os.path.join(
             GUI.base_dir, 'images/hefftorlinux.svg'))
         self.set_position(Gtk.WindowPosition.CENTER)
-        self.connect("delete-event", Gtk.main_quit)
+        # self.connect("delete-event", Gtk.main_quit)
+        self.connect('destroy', Gtk.main_quit)
         # self.connect("check_resize", self.on_check_resize)
         self.ecode = 0
         self.browser = 0
 
+        
+
         GUI.GUI(self, Gtk, GdkPixbuf, GLib)
+        
 
 # ===========================================================================================================
 
@@ -312,6 +317,13 @@ def signal_handler(sig, frame):
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
-    window = HSApp()
-    window.show_all()
+    w = HSApp()
+    splash = Splash.Splash()
+    splash.start()
+    for i in range(5):
+        splash.progress.set_fraction(splash.progress.get_fraction() + 0.2)
+        Splash.sleep(0.7)
+    splash.destroy()
+    
+    w.show_all()  
     Gtk.main()
