@@ -2,9 +2,9 @@
 Name=Hefftor SkelApp
 GenericName=Skel Config Copy
 X-GNOME-FullName=Hefftor SkelApp
-Comment=Copy /etc/skel into your configs
+Comment=Safeguard your configuration
 Exec=hefftor-skelapp
-Icon=/usr/share/Hefftor-SkelApp/images/hefftorlinux.svg
+Icon=skel-app.svg
 Terminal=false
 Type=Application
 Categories=GTK;Settings;Security;X-GNOME-Settings-Panel;X-GNOME-SystemSettings;X-Unity-Settings-Panel;X-XFCE-SettingsDialog;X-XFCE-SystemSettings;
