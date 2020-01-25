@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import Splash
+# import Splash
 import Functions
 import Help
 import GUI
@@ -323,11 +323,10 @@ def signal_handler(sig, frame):
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
-    splash = Splash.Splash()
-    splash.start()
-    sleep(3)
-    splash.window.destroy()
-    
+    # splash = Splash.Splash()
+    # splash.start()
+    # sleep(3)
     w = HSApp()
+    # splash.window.destroy()
     w.show_all()
     Gtk.main()
