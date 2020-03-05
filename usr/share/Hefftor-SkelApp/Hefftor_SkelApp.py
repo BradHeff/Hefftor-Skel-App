@@ -11,10 +11,9 @@ import threading
 import re
 import os
 import gi
+from time import sleep # noqa
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, GLib
-from time import sleep
-
+from gi.repository import Gtk, GdkPixbuf, GLib # noqa
 
 
 home = expanduser("~")
